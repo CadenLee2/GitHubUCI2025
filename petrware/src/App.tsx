@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import './App.css'
+import Homepage from './components/homepage';
+import EndScreen from './components/endScreen';
 
 /** The bar at the top that shows the score */
 function ScoreBar(props: {totalScore: number}) {
@@ -12,21 +14,6 @@ function ScoreBar(props: {totalScore: number}) {
       </span>
     </div>
   )
-}
-
-/** The first screen that appears when the user enters the game */
-function Homepage(props: { startGame: () => void }) {
-  const { startGame } = props;
-
-  return (
-    <div className="home">
-      <h1>Petrware</h1>
-      <div>
-        <span>Welcome!</span>
-      </div>
-      <button onClick={startGame}>Start</button>
-    </div>
-  );
 }
 
 /** The main display of the app */
@@ -45,8 +32,9 @@ function App() {
         <div className="main-box">
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
-            {currentPage == "home" && <Homepage startGame={() => goToPage("game1")} />}
+            {currentPage == "home" && <Homepage startGame={() => goToPage("end")} />}
             {currentPage == "game1" && <span>Put game pages here</span>}
+            {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>
       </div>
