@@ -1,0 +1,35 @@
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 30px;
+  height: 100%;
+}
+
+.quests {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 40px;
+}
+
+.quest {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox {
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  border: solid 2px white;
+}
+
+canvas.main-canvas {
+  width: 100%;
+  flex-grow: 1;
+}
