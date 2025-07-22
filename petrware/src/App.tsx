@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import './App.css'
-import Homepage from './components/homepage';
-import EndScreen from './components/endScreen';
+import Homepage from './components/Homepage';
+import EndScreen from './components/EndScreen';
+import RoadMinigame from './road_minigame/RoadMinigame';
 
 /** The bar at the top that shows the score */
 function ScoreBar(props: {totalScore: number}) {
@@ -32,8 +33,8 @@ function App() {
         <div className="main-box">
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
-            {currentPage == "home" && <Homepage startGame={() => goToPage("end")} />}
-            {currentPage == "game1" && <span>Put game pages here</span>}
+            {currentPage == "home" && <Homepage startGame={() => goToPage("game1")} />}
+            {currentPage == "game1" && <RoadMinigame />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>
