@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
-import Homepage from './components/homepage';
-import EndScreen from './components/endScreen';
+import Homepage from './components/Homepage';
+import EndScreen from './components/EndScreen';
 
 /** The bar at the top that shows the score */
 function ScoreBar(props: {totalScore: number}) {
