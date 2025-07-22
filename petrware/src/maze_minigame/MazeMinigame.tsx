@@ -56,7 +56,7 @@ const STUDENT_CENTER_FLOOR_1 = [
 ];
 
 export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
-  const [player, setPlayer] = useState<Player>({
+  const player = useRef<Player>({
     x: 12,
     y: 12,
     floor: 2
@@ -83,8 +83,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0) {
     // Determine the offset based on the player's position
     const offsetRatio = 0.0001;
-    const newOffsetX = (22 - player.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
-    const newOffsetY = (16 - player.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
+    const newOffsetX = (22 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
+    const newOffsetY = (16 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
     offsetX.current = newOffsetX;
     offsetY.current = newOffsetY;
     ctx.fillRect(
@@ -103,14 +103,17 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     ctx.imageSmoothingEnabled = false;
     ctx.fillRect(0, 0, width, height);
     // Get image
-    if (player.floor == 2) {
+    if (player.current.floor == 2) {
+      ctx.globalAlpha = 0.5;
       ctx.drawImage(assetStudentCenter!.current as CanvasImageSource, 0, 0, width, height);
     } else {
+      ctx.globalAlpha = 0.5;
       ctx.drawImage(assetStudentCenterInterior!.current as CanvasImageSource, 0, 0, width, height);
     }
+    ctx.globalAlpha = 1.0;
     // Floor plan
     // TODO: allow multiple floors
-    const floorPlan = player.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
+    const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
     for (let y = 0; y < floorPlan.length; y++) {
       for (let x = 0; x < floorPlan[y].length; x++) {
         // Render
@@ -129,7 +132,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
           renderAtCoord(x, y, ctx);
         } else if (tile == 'S') {
           // Stairs
-          if (player.floor == 2) {
+          if (player.current.floor == 2) {
             ctx.fillStyle = "black";
           } else {
             ctx.fillStyle = "#e5dda7";
@@ -138,7 +141,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
           for (let i = 0; i < 0.99; i += 0.2) {
             // TODO: different style for going upstairs vs downstairs
             let alphapercent = 1 - (i / 2);
-            if (player.floor == 2) {
+            if (player.current.floor == 2) {
               if (y > 0 && floorPlan[y - 1][x] == 'S') {
                 // This is the lower stairs
                 alphapercent -= 0.5;
@@ -161,16 +164,16 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     // Player
     // TODO: draw an image of the player instead?
     ctx.fillStyle = "red";
-    renderAtCoord(player.x, player.y, ctx);
+    renderAtCoord(player.current.x, player.current.y, ctx);
   }
 
   function handleKeys() {
-    const floorPlan = player.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
+    const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
     let pressed = false
     for (const key of Object.keys(keysPressed)) {
       const control = controls[key];
-      const playerOrigY = player.y;
-      const playerOrigX = player.x;
+      const playerOrigY = player.current.y;
+      const playerOrigX = player.current.x;
       // Movement
       if (Date.now() < cooldown.current) {
         // Still cooling down
@@ -178,34 +181,33 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       }
       pressed = true;
       if (control == 'up') {
-        player.y--;
+        player.current.y--;
       }
       if (control == 'down') {
-        player.y++;
+        player.current.y++;
       }
       if (control == 'left') {
-        player.x--;
+        player.current.x--;
       }
       if (control == 'right') {
-        player.x++;
+        player.current.x++;
       }
       const colliding =
-        player.x < 0 || player.y < 0
-        || player.y >= floorPlan.length
-        || player.x >= floorPlan[player.y].length
-        || floorPlan[player.y][player.x] == 'x'
+        player.current.x < 0 || player.current.y < 0
+        || player.current.y >= floorPlan.length
+        || player.current.x >= floorPlan[player.current.y].length
+        || floorPlan[player.current.y][player.current.x] == 'x'
       if (colliding) {
-        player.x = playerOrigX;
-        player.y = playerOrigY;
+        player.current.x = playerOrigX;
+        player.current.y = playerOrigY;
       }
       // New position
-      const justHitStairs = floorPlan[player.y][player.x] == 'S'
+      const justHitStairs = floorPlan[player.current.y][player.current.x] == 'S'
         && floorPlan[playerOrigY][playerOrigX] != 'S';
       if (justHitStairs) {
-        if (player.floor == 2) player.floor = 1;
-        else player.floor = 2;
+        if (player.current.floor == 2) player.current.floor = 1;
+        else player.current.floor = 2;
       }
-      setPlayer(player);
     }
     if (pressed) {
       cooldown.current = Date.now() + 60;
@@ -214,7 +216,6 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
 
   /** Call this function each frame */
   function frame() {
-    console.log("frame");
     handleKeys();
     render();
   }
