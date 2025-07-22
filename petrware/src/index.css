@@ -1,0 +1,18 @@
+:root {
+  font-family: Arial, sans-serif;
+  --bg: rgb(20, 21, 23);
+  --text: rgb(232, 233, 235);
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+}
