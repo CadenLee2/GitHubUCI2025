@@ -3,11 +3,13 @@ import { useRef, useEffect, useState } from "react";
 import ImageStudentCenter from "../assets/studentCenter.png";
 import ImageStudentCenterInterior from "../assets/studentCenterInterior.png";
 import ImagePetr from "../assets/PetrCharacter.png";
+import ImagePetr2 from "../assets/PetrCharacter2.png";
 
 type Player = {
   x: number,
   y: number,
-  floor: number
+  floor: number,
+  walkingStep: number
 }
 
 type KeysPressed = {[key: string]: number};
@@ -60,7 +62,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const player = useRef<Player>({
     x: 12,
     y: 12,
-    floor: 2
+    floor: 2,
+    walkingStep: 0
   });
 
   // Using ref to prevent issues with useEffect
@@ -69,11 +72,14 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const offsetX = useRef(0);
   const offsetY = useRef(0);
 
+  const timer = useRef<number | null>(null);
+
   const canvas = useRef<null | HTMLCanvasElement>(null);
   const canvasWrapper = useRef<null | HTMLDivElement>(null);
   const assetStudentCenter = useRef<null | HTMLImageElement>(null);
   const assetStudentCenterInterior = useRef<null | HTMLImageElement>(null);
   const assetPetr = useRef<null | HTMLImageElement>(null);
+  const assetPetr2 = useRef<null | HTMLImageElement>(null);
 
   const tileWidth = 36;
   const controls: Record<string, string> = {
@@ -94,6 +100,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     const realY = Math.floor((newOffsetY + y) * tileWidth);
     const realWidth = w * tileWidth + 1;
     const realHeight = h * tileWidth + 1;
+    // Render
     if (img) {
       ctx.imageSmoothingEnabled = true;
       ctx.drawImage(img, realX, realY, realWidth, realHeight);
@@ -108,7 +115,6 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     const width = canvas.current!.offsetWidth;
     const height = canvas.current!.offsetHeight;
     canvas.current!.width = width;
-    //canvas.current!.height = height;
     // Bg
     ctx.fillStyle = "black";
     ctx.imageSmoothingEnabled = false;
@@ -175,12 +181,31 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     // Player
     // TODO: draw an image of the player instead?
     ctx.fillStyle = "red";
-    renderAtCoord(player.current.x - 0.4, player.current.y - 0.4, ctx, 1.8, 1.8, assetPetr!.current as CanvasImageSource);
+    renderAtCoord(
+      player.current.x - 0.4, 
+      player.current.y - 0.4, 
+      ctx, 
+      1.8, 
+      1.8, 
+      player.current.walkingStep == 0 ?
+        assetPetr!.current as CanvasImageSource :
+        assetPetr2!.current as CanvasImageSource
+    );
+    // UI
+    if (timer) {
+      const timeLeft = (timer.current ?? 0) - Date.now();
+      const secLeftTotal = Math.floor(timeLeft / 1000);
+      const minLeft = Math.floor(secLeftTotal / 60);
+      const secLeft = secLeftTotal % 60;
+      const formatTime = minLeft + ":" + (secLeft < 10 ? '0' : '') + secLeft;
+      ctx.font="24px Arial";
+      ctx.fillText(formatTime, width - 180, 40);
+    }
   }
 
   function handleKeys() {
     const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
-    let pressed = false
+    let pressed = false;
     for (const key of Object.keys(keysPressed)) {
       const control = controls[key];
       const playerOrigY = player.current.y;
@@ -190,18 +215,18 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         // Still cooling down
         continue;
       }
-      pressed = true;
       if (control == 'up') {
         player.current.y--;
-      }
-      if (control == 'down') {
+        pressed = true;
+      } else if (control == 'down') {
         player.current.y++;
-      }
-      if (control == 'left') {
+        pressed = true;
+      } else if (control == 'left') {
         player.current.x--;
-      }
-      if (control == 'right') {
+        pressed = true;
+      } else if (control == 'right') {
         player.current.x++;
+        pressed = true;
       }
       const colliding =
         player.current.x < 0 || player.current.y < 0
@@ -221,7 +246,9 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       }
     }
     if (pressed) {
-      cooldown.current = Date.now() + 60;
+      cooldown.current = Date.now() + 70;
+      // Animate the character
+      player.current.walkingStep = 1 - player.current.walkingStep;
     }
   }
 
@@ -260,6 +287,11 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     }
   });
 
+  useEffect(() => {
+    const GAME_DURATION = 60 * 1000;
+    timer.current = Date.now() + GAME_DURATION;
+  }, []);
+
   return (
     <div className="main-container">
       <div className="quests">
@@ -283,6 +315,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <img src={ImageStudentCenter} ref={assetStudentCenter} />
         <img src={ImageStudentCenterInterior} ref={assetStudentCenterInterior} />
         <img src={ImagePetr} ref={assetPetr} />
+        <img src={ImagePetr2} ref={assetPetr2} />
       </div>
     </div>
   );
