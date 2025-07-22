@@ -33,3 +33,7 @@ canvas.main-canvas {
   width: 100%;
   flex-grow: 1;
 }
+
+.assets {
+  display: none;
+}
