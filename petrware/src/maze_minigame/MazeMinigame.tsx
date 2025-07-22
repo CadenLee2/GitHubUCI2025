@@ -2,6 +2,7 @@ import './MazeMinigame.css';
 import { useRef, useEffect, useState } from "react";
 import ImageStudentCenter from "../assets/studentCenter.png";
 import ImageStudentCenterInterior from "../assets/studentCenterInterior.png";
+import ImagePetr from "../assets/PetrCharacter.png";
 
 type Player = {
   x: number,
@@ -26,7 +27,7 @@ const STUDENT_CENTER_FLOOR_2 = [
   "                                  xx   x xx          x        x          ",
   "                                           xx        x     xxxx     xxxxx",
   "                                             xx      x    x         x    ",
-  "        xxDx                                   xDxxDxx   x xxx      D    ",
+  "        xxDx                                   xDxxDDx   x xxx      D    ",
   "      xx    xx                                       x   x   x      x    ",
   "    xx        xxxxxDxxxxxxx                        xSx   x   xxxxxxxx    ",
   "  xx          x            x                       xSxDxxxxxxx           ",
@@ -34,25 +35,25 @@ const STUDENT_CENTER_FLOOR_2 = [
 ];
 
 const STUDENT_CENTER_FLOOR_1 = [
-  "                x        x       x                 x                     ",
-  "                xxx      x       x                 x                     ",
-  "                xSx      x       x                 x              xxxxxxx",
-  "                xSx      x       x                 x              x   x  ",
-  "                x        xxxxxxxxx                 x              x xxx  ",
-  "                D        x   x   x                x               xSx    ",
-  "                x       xSxDxx   xxxxxxxxxxxxxxxxxxx              xSx    ",
-  "                x       xSx  xxx x      x          x                 xxxx",
-  "                xxxxxDxxx  x   x x      x          xxx                   ",
-  "xxxxx           x          xxxxxDx      x            x         xxxxxxxxxx",
-  "     xxxxxxxxDxxx                x  xDx x            D        x          ",
-  "                                  xx   x xx          x        x          ",
-  "                                           xx        x     xxxx     xxxxx",
-  "                                             xx      x    x         x    ",
-  "        xxDx                                   xDxxDxx   x xxx      D    ",
-  "      xx    xx                                     xSx   x   x      x    ",
-  "    xx        xxxxxDxxxxxxx                        xSx   x   xxxxxxxx    ",
-  "  xx          x            x                         xDxxxxxxx           ",
-  "xx            x             x                                            ",
+  "    x           x       x        x                 x                     ",
+  "xxxxx    xxxxxxxxxx     x        x                 x                     ",
+  "    x    x      xSx     x        x                 x              xxxxxxx",
+  "    D    D      xSx     x        x                 D              x   x  ",
+  "    x    x      x       x        x                 x              x xxx  ",
+  "    D    D      x       xxxDxxxxxx                x               xSx    ",
+  "    x    x      x       xSx xx   xxxDDxxxxxDxxxxxxxx              xSx    ",
+  "xxxx      xxxxxxx       xSx  xxx x      x          x                 xxxx",
+  "                xxxxxDxxx      x x      x          xxx                   ",
+  "xxxxx           x                x      x            xxxxxx    xxxxxxxxxx",
+  "     xxxxxxxxDxxx       xxDxxDxxDx      x            x     x  x   x      ",
+  "                        x        x       xx          x     x  x   x      ",
+  "                        xxDxxDxxDx         xx        D     xxxx    xxxxxx",
+  "          xxx                                xx      x    x   x          ",
+  "        xx   xDx                               xDxxDxx   x    xxxxxx     ",
+  "      Dx        xxx                 xx             xSxDDDx    x          ",
+  "    xx             xDx            xx  xxx          xSx   x    xxxxxx     ",
+  "  xx                  xxx       DD       xxx             D               ",
+  "xx                       xDx  xx            xxx          x               ",
 ];
 
 export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
@@ -69,10 +70,12 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const offsetY = useRef(0);
 
   const canvas = useRef<null | HTMLCanvasElement>(null);
+  const canvasWrapper = useRef<null | HTMLDivElement>(null);
   const assetStudentCenter = useRef<null | HTMLImageElement>(null);
   const assetStudentCenterInterior = useRef<null | HTMLImageElement>(null);
+  const assetPetr = useRef<null | HTMLImageElement>(null);
 
-  const tileWidth = 20;
+  const tileWidth = 36;
   const controls: Record<string, string> = {
     'w': 'up',
     'a': 'left',
@@ -80,24 +83,32 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     'd': 'right'
   }
 
-  function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0) {
+  function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0, img: CanvasImageSource | null = null) {
     // Determine the offset based on the player's position
     const offsetRatio = 0.0001;
-    const newOffsetX = (22 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
-    const newOffsetY = (16 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
+    const newOffsetX = (13 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
+    const newOffsetY = (9 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
     offsetX.current = newOffsetX;
     offsetY.current = newOffsetY;
-    ctx.fillRect(
-      Math.floor((newOffsetX + x) * tileWidth),
-      Math.floor((newOffsetY + y) * tileWidth),
-      w * tileWidth + 1, h * tileWidth + 1
-    );
+    const realX = Math.floor((newOffsetX + x) * tileWidth);
+    const realY = Math.floor((newOffsetY + y) * tileWidth);
+    const realWidth = w * tileWidth + 1;
+    const realHeight = h * tileWidth + 1;
+    if (img) {
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(img, realX, realY, realWidth, realHeight);
+      ctx.imageSmoothingEnabled = false;
+    } else {
+      ctx.fillRect(realX, realY, realWidth, realHeight);
+    }
   }
 
   function render() {
     const ctx = canvas.current!.getContext("2d")!;
-    const width = canvas.current!.width;
-    const height = canvas.current!.height;
+    const width = canvas.current!.offsetWidth;
+    const height = canvas.current!.offsetHeight;
+    canvas.current!.width = width;
+    //canvas.current!.height = height;
     // Bg
     ctx.fillStyle = "black";
     ctx.imageSmoothingEnabled = false;
@@ -164,7 +175,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     // Player
     // TODO: draw an image of the player instead?
     ctx.fillStyle = "red";
-    renderAtCoord(player.current.x, player.current.y, ctx);
+    renderAtCoord(player.current.x - 0.4, player.current.y - 0.4, ctx, 1.8, 1.8, assetPetr!.current as CanvasImageSource);
   }
 
   function handleKeys() {
@@ -264,11 +275,14 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
           <span>Escape the student center</span>
         </div>
       </div>
-      <canvas ref={canvas} className="main-canvas" width={936} height={655}>
-      </canvas>
+      <div ref={canvasWrapper} className="canvas-wrapper">
+        <canvas ref={canvas} className="main-canvas" width={936} height={655}>
+        </canvas>
+      </div>
       <div className="assets">
         <img src={ImageStudentCenter} ref={assetStudentCenter} />
         <img src={ImageStudentCenterInterior} ref={assetStudentCenterInterior} />
+        <img src={ImagePetr} ref={assetPetr} />
       </div>
     </div>
   );
