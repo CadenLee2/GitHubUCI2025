@@ -7,27 +7,54 @@ import ImagePetr2 from "../assets/PetrCharacter2.png";
 import ImageBackpack from "../assets/Backpack.png";
 import ImageWaterBottle from "../assets/WaterBottle.png";
 import ImageQuestionMark from "../assets/QuestionMark.png";
+import type {
+  Objective,
+  Player,
+  KeysPressed,
+  ScreenName
+} from "./types";
 import {
   STUDENT_CENTER_FLOOR_2,
   STUDENT_CENTER_FLOOR_1,
   ROOMS_2,
   ROOMS_1,
   ROOMS_2_QCOORDS,
-  ROOMS_1_QCOORDS
+  ROOMS_1_QCOORDS,
+  TARGET,
+  OBJECTIVES_DEFAULT,
 } from "./Constants.ts";
 
-type Player = {
-  x: number,
-  y: number,
-  floor: number,
-  walkingStep: number,
-  hasCollectibles: Set<string>,
-  beenTo: Set<string>
+function timeUntil(timePoint: number) {
+  const timeLeft = timePoint - Date.now();
+  const secLeftTotal = Math.floor(timeLeft / 1000);
+  const minLeft = Math.floor(secLeftTotal / 60);
+  const secLeft = secLeftTotal % 60;
+  return { minLeft, secLeft };
 }
 
-type KeysPressed = {[key: string]: true};
+function ObjectiveDisplay(props: { objectives: Objective[], column?: true }) {
+  return (
+    <div className={ props.column ? "quests-col" : "quests" }>
+      {
+        props.objectives.map((obj, i) => 
+          <div key={i} className="quest">
+            <div className={`checkbox ${obj.complete ? "checked" : ""}`}>
+              {obj.complete && 'X'}
+            </div>
+            <span className={obj.complete ? "finished-text" : undefined}>{obj.text}</span>
+          </div>
+        )
+      }
+    </div>
+  );
+}
 
-export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
+function MazeMinigameGame(props: {
+  win: (timeMins: number, timeSecs: number) => void,
+  lose: (points: number) => void
+}) {
+  const { win, lose } = props;
+
   const player = useRef<Player>({
     x: 71,
     y: 17,
@@ -36,20 +63,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     hasCollectibles: new Set<string>(),
     beenTo: new Set<string>()
   });
-  const [objectives, setObjectives] = useState([
-    {
-      text: "Find your water bottle in the East Food Court",
-      complete: false
-    },
-    {
-      text: "Find your backpack at Emerald Bay",
-      complete: false
-    },
-    {
-      text: "Escape the student center (get to Ring Road)",
-      complete: false
-    }
-  ]);
+  const [objectives, setObjectives] = useState(OBJECTIVES_DEFAULT);
 
   // Using ref to prevent issues with useEffect
   const keysPressed = useRef<KeysPressed>({});
@@ -251,10 +265,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       ctx.roundRect(width - 130, 20, 74, 30, 8);
       ctx.fill();
       ctx.fillStyle = "orange";
-      const timeLeft = (timer.current ?? 0) - Date.now();
-      const secLeftTotal = Math.floor(timeLeft / 1000);
-      const minLeft = Math.floor(secLeftTotal / 60);
-      const secLeft = secLeftTotal % 60;
+      const { minLeft, secLeft } = timeUntil(timer.current ?? 0);
       const formatTime = minLeft + ":" + (secLeft < 10 ? '0' : '') + secLeft;
       ctx.font="28px Arial";
       ctx.fillText(formatTime, width - 120, 44);
@@ -367,9 +378,32 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     }
   }
 
+  function checkEndConditions() {
+    const { minLeft, secLeft } = timeUntil(timer.current ?? 0);
+    const gameLost = minLeft < 0 || (minLeft == 0 && secLeft <= 0);
+    if (gameLost) {
+      lose();
+      return;
+    }
+    let gameWon = true;
+    for (const colName of Object.keys(collectibles.current)) {
+      if (!player.current.hasCollectibles.has(colName)) gameWon = false;
+    }
+    const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
+    const tile = floorPlan[player.current.y][player.current.x];
+    if (player.current.floor != TARGET.floor || tile != TARGET.tile) {
+      gameWon = false;
+    }
+    if (gameWon) {
+      win(minLeft, secLeft);
+      return;
+    }
+  }
+
   /** Call this function each frame */
   function frame() {
     handleKeys();
+    checkEndConditions();
     render();
   }
 
@@ -397,26 +431,16 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   });
 
   useEffect(() => {
+    // Start the game the moment this is first rendered
     const GAME_DURATION_SECONDS = 80;
     timer.current = Date.now() + GAME_DURATION_SECONDS * 1000;
   }, []);
 
   return (
-    <div className="main-container">
+    <>
       <div>
         <span>You accidentally left some of your belongings in the Student Center!</span>
-        <div className="quests">
-          {
-            objectives.map((obj, i) => 
-              <div key={i} className="quest">
-                <div className={`checkbox ${obj.complete ? "checked" : ""}`}>
-                  {obj.complete && 'X'}
-                </div>
-                <span className={obj.complete ? "finished-text" : undefined}>{obj.text}</span>
-              </div>
-            )
-          }
-        </div>
+        <ObjectiveDisplay objectives={objectives} />
       </div>
       <div ref={canvasWrapper} className="canvas-wrapper">
         <canvas ref={canvas} className="main-canvas" width={936} height={615}>
@@ -431,6 +455,62 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <img src={ImageWaterBottle} ref={assetWaterBottle} />
         <img src={ImageQuestionMark} ref={assetQuestionMark} />
       </div>
+    </>
+  );
+}
+
+export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
+  const { finishGame } = props;
+
+  const [screen, setScreen] = useState<ScreenName>("instructions");
+  const [minLeft, setMinLeft] = useState(-1);
+  const [secLeft, setSecLeft] = useState(-1);
+  const [pointsWon, setPointsWon] = useState(-1);
+
+  function win(minLeftNum: number, secLeftNum: number) {
+    setScreen("win");
+    setPointsWon(minLeftNum * 60 + secLeftNum);
+    setMinLeft(minLeftNum);
+    setSecLeft(secLeftNum);
+  }
+
+  function lose() {
+    setScreen("lose");
+  }
+
+  return (
+    <div className="main-container">
+      {
+        screen == "instructions" ?
+          <div className="info-column">
+            <span>You accidentally left some of your belongings in UCI's Student Center.</span>
+            <span>Find them quickly!</span>
+            <span>Use WASD or the arrow keys to move around the map. You can use stairs to go between floors.</span>
+            <ObjectiveDisplay column objectives={OBJECTIVES_DEFAULT} />
+            <span></span>
+            <button onClick={() => setScreen("game")}>Start Minigame</button>
+          </div>
+        : screen == "game" ? <MazeMinigameGame win={win} lose={lose} />
+        : screen == "win" ?
+          <div className="info-column">
+            <span>
+              You succeeded with {minLeft} minutes and {secLeft} seconds left!
+            </span>
+            <span>
+              <b>+{pointsWon} points</b>
+            </span>
+            <span>
+              Next, you head to Aldrich Park.
+            </span>
+            <button onClick={() => finishGame(pointsWon)}>Next game</button>
+          </div>
+        : 
+          <div className="info-column">
+            <span>Time's up!</span>
+            <span>You didn't get everything. Better luck next time...</span>
+            <button onClick={() => location.reload()}>Back to main menu</button>
+          </div>
+      }
     </div>
   );
 }

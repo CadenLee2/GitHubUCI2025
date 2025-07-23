@@ -1,3 +1,5 @@
+import type { Objective } from "./types";
+
 export const STUDENT_CENTER_FLOOR_2 = [
   "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
   "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
@@ -16,8 +18,8 @@ export const STUDENT_CENTER_FLOOR_2 = [
   "99999999xxDx99999999999999999999999999999999999999999x555x xxx666666Duuuu",
   "999999xx    xx9999999999999999999999999999999999999xSx555x   x666666xuuuu",
   "9999xx        xxxxxDxxxxxxx999999999999999999999999xSx555x   xxxxxxxxuuuu",
-  "99xx          x            x999999999999999999999999xxDxxxxxxxuuuuuuuuuuu",
-  "xx            x             x99999999999999999999999999999999uuuuuuuuuuuu",
+  "99xx          x            x999999999999999999999999xxDxxxxxxx999999uuuuu",
+  "xx            x             x999999999999999999999999999999999999999uuuuu",
 ];
 
 // 0         1         2         3         4         5         6         7         8
@@ -74,6 +76,26 @@ export const ROOMS_1: Record<string, string> = {
   'e': 'West Courtyard',
   'f': 'Pacific Ballroom'
 };
+
+export const TARGET = {
+  floor: 2,
+  tile: 'u'
+}
+
+export const OBJECTIVES_DEFAULT: Objective[] = [
+  {
+    text: "Find your water bottle in the East Food Court",
+    complete: false
+  },
+  {
+    text: "Find your backpack at Emerald Bay",
+    complete: false
+  },
+  {
+    text: "Escape the student center (get back to Ring Road)",
+    complete: false
+  }
+];
 
 export const ROOMS_2_QCOORDS: Record<string, { x: number, y: number }> = {
   '1': { x: 4, y: 5 },

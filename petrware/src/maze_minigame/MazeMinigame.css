@@ -15,6 +15,15 @@
   margin-top: 20px;
 }
 
+.quests-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 .quest {
   display: flex;
   flex-direction: row;
@@ -56,4 +65,15 @@ canvas.main-canvas {
 
 .assets {
   display: none;
+}
+
+div.info-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+  padding: 100px;
+  text-align: center;
 }
