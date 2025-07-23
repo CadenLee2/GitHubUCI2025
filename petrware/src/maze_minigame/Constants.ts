@@ -20,6 +20,8 @@ export const STUDENT_CENTER_FLOOR_2 = [
   "xx            x             x99999999999999999999999999999999999999999999",
 ];
 
+// 0         1         2         3         4         5         6         7         8
+// 012345678901234567890123456789012345678901234567890123456789012345678901234567890
 export const STUDENT_CENTER_FLOOR_1 = [
   "    x33333333333x4444444x55555555x66666666666666666xddddddddddddddddddddd",
   "xxxxx3333xxxxxxxxxx44444x55555555x66666666666666666xddddddddddddddddddddd",
@@ -72,5 +74,30 @@ export const ROOMS_1: Record<string, string> = {
   'f': 'Pacific Ballroom'
 };
 
-export const ROOMS_2_QCOORDS: Record<string, string> = {
+export const ROOMS_2_QCOORDS: Record<string, { x: number, y: number }> = {
+  '1': { x: 4, y: 5 },
+  '2': { x: 21, y: 3 },
+  '3': { x: 29, y: 1 },
+  '5': { x: 56, y: 11 },
+  '6': { x: 64, y: 13 },
+  '7': { x: 37, y: 8 },
+  '8': { x: 47, y: 9 },
+  ' ': { x: 9, y: 17 },
+  'a': { x: 29, y: 7 }
+};
+
+export const ROOMS_1_QCOORDS: Record<string, { x: number, y: number }> = {
+  '1': { x: 2, y: 4 },
+  '2': { x: 13, y: 4 },
+  '3': { x: 7, y: 6 },
+  '4': { x: 20, y: 5 },
+  '5': { x: 28, y: 2 },
+  '6': { x: 42, y: 3 },
+  '7': { x: 29, y: 11 },
+  '8': { x: 47, y: 10 },
+  '9': { x: 56, y: 12 },
+  'c': { x: 65, y: 17 },
+  'd': { x: 59, y: 5 },
+  'e': { x: 11, y: 16 },
+  'f': { x: 37, y: 18 },
 };

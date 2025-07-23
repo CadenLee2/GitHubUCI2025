@@ -5,14 +5,23 @@ import ImageStudentCenterInterior from "../assets/studentCenterInterior.png";
 import ImagePetr from "../assets/PetrCharacter.png";
 import ImagePetr2 from "../assets/PetrCharacter2.png";
 import ImageBackpack from "../assets/Backpack.png";
-import { STUDENT_CENTER_FLOOR_2, STUDENT_CENTER_FLOOR_1, ROOMS_2, ROOMS_1 } from "./Constants.ts";
+import ImageQuestionMark from "../assets/QuestionMark.png";
+import {
+  STUDENT_CENTER_FLOOR_2,
+  STUDENT_CENTER_FLOOR_1,
+  ROOMS_2,
+  ROOMS_1,
+  ROOMS_2_QCOORDS,
+  ROOMS_1_QCOORDS
+} from "./Constants.ts";
 
 type Player = {
   x: number,
   y: number,
   floor: number,
   walkingStep: number,
-  hasBackpack: boolean
+  hasBackpack: boolean,
+  beenTo: Set<string>
 }
 
 type KeysPressed = {[key: string]: true};
@@ -23,7 +32,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     y: 17,
     floor: 2,
     walkingStep: 0,
-    hasBackpack: false
+    hasBackpack: false,
+    beenTo: new Set<string>()
   });
 
   const backpackCoords = useRef({ x: 14, y: 4, floor: 1 } );
@@ -43,6 +53,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const assetPetr = useRef<null | HTMLImageElement>(null);
   const assetPetr2 = useRef<null | HTMLImageElement>(null);
   const assetBackpack = useRef<null | HTMLImageElement>(null);
+  const assetQuestionMark = useRef<null | HTMLImageElement>(null);
 
   const tileWidth = 36;
   const controls: Record<string, string> = {
@@ -97,6 +108,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     ctx.globalAlpha = 1.0;
     // Floor plan is based on the player's current floor
     const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
+    const qCoords = player.current.floor == 2 ? ROOMS_2_QCOORDS : ROOMS_1_QCOORDS;
     // Identify which room the player is in
     const playerRoom = floorPlan[player.current.y][player.current.x];
     for (let y = 0; y < floorPlan.length; y++) {
@@ -145,8 +157,16 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
           ctx.fillStyle = "beige";
           renderAtCoord(x, y, ctx);
         } else {
+          // Invisible
           ctx.fillStyle = "#c4c4b4";
           renderAtCoord(x, y, ctx);
+          const showQuestionMark = (
+            qCoords[tile] && x == qCoords[tile].x && y == qCoords[tile].y
+            && !player.current.beenTo.has(tile)
+          );
+          if (showQuestionMark) {
+            renderAtCoord(x, y, ctx, 1, 1, assetQuestionMark.current as CanvasImageSource);
+          }
         }
       }
     }
@@ -241,7 +261,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         player.current.y = playerOrigY;
       }
       // New position
-      const justHitStairs = floorPlan[player.current.y][player.current.x] == 'S'
+      const tile = floorPlan[player.current.y][player.current.x];
+      const justHitStairs = tile == 'S'
         && floorPlan[playerOrigY][playerOrigX] != 'S';
       if (justHitStairs) {
         if (player.current.floor == 2) player.current.floor = 1;
@@ -256,6 +277,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       if (gotBackpack) {
         player.current.hasBackpack = true;
       }
+      player.current.beenTo.add(tile);
     }
     if (pressed) {
       cooldown.current = Date.now() + 70;
@@ -323,6 +345,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <img src={ImagePetr} ref={assetPetr} />
         <img src={ImagePetr2} ref={assetPetr2} />
         <img src={ImageBackpack} ref={assetBackpack} />
+        <img src={ImageQuestionMark} ref={assetQuestionMark} />
       </div>
     </div>
   );
