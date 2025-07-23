@@ -22,15 +22,8 @@ import {
   ROOMS_1_QCOORDS,
   TARGET,
   OBJECTIVES_DEFAULT,
-} from "./Constants.ts";
-
-function timeUntil(timePoint: number) {
-  const timeLeft = timePoint - Date.now();
-  const secLeftTotal = Math.floor(timeLeft / 1000);
-  const minLeft = Math.floor(secLeftTotal / 60);
-  const secLeft = secLeftTotal % 60;
-  return { minLeft, secLeft };
-}
+} from "./constants.ts";
+import { timeUntil, renderDiamond, renderRoundRect } from "./utils.ts";
 
 function ObjectiveDisplay(props: { objectives: Objective[], column?: true }) {
   return (
@@ -51,7 +44,7 @@ function ObjectiveDisplay(props: { objectives: Objective[], column?: true }) {
 
 function MazeMinigameGame(props: {
   win: (timeMins: number, timeSecs: number) => void,
-  lose: (points: number) => void
+  lose: () => void
 }) {
   const { win, lose } = props;
 
@@ -71,7 +64,7 @@ function MazeMinigameGame(props: {
   const offsetX = useRef(0);
   const offsetY = useRef(0);
 
-  const timer = useRef<number | null>(null);
+  const endTime = useRef<number | null>(null);
 
   const canvas = useRef<null | HTMLCanvasElement>(null);
   const canvasWrapper = useRef<null | HTMLDivElement>(null);
@@ -117,18 +110,14 @@ function MazeMinigameGame(props: {
   }
 
   function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0, img: CanvasImageSource | null = null) {
-    // Determine the offset based on the player's position
-    const offsetRatio = 0.0001;
-    const screenWidthTiles = ctx.canvas.width / tileWidth - 1;
-    const screenHeightTiles = ctx.canvas.height / tileWidth - 1;
-    const newOffsetX = (screenWidthTiles / 2 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
-    const newOffsetY = (screenHeightTiles / 2 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
-    offsetX.current = newOffsetX;
-    offsetY.current = newOffsetY;
-    const realX = Math.floor((newOffsetX + x) * tileWidth);
-    const realY = Math.floor((newOffsetY + y) * tileWidth);
+    const realX = Math.floor((offsetX.current + x) * tileWidth);
+    const realY = Math.floor((offsetY.current + y) * tileWidth);
     const realWidth = w * tileWidth + 1;
     const realHeight = h * tileWidth + 1;
+    // Skip rendering if this item is fully off-screen
+    if (realX + realWidth < 0 || realY + realHeight < 0 || realX > ctx.canvas.width || realY > ctx.canvas.height) {
+      return;
+    }
     // Render
     if (img) {
       ctx.imageSmoothingEnabled = true;
@@ -144,6 +133,16 @@ function MazeMinigameGame(props: {
     const width = canvas.current!.offsetWidth;
     const height = canvas.current!.offsetHeight;
     canvas.current!.width = width;
+    // Determine the offset based on the player's position
+    const offsetRatio = 0.15;
+    const screenWidthTiles = width / tileWidth - 1;
+    const screenHeightTiles = height / tileWidth - 1;
+    const newOffsetX = (screenWidthTiles / 2 - player.current.x)
+      * offsetRatio + offsetX.current * (1 - offsetRatio);
+    const newOffsetY = (screenHeightTiles / 2 - player.current.y)
+      * offsetRatio + offsetY.current * (1 - offsetRatio);
+    offsetX.current = newOffsetX;
+    offsetY.current = newOffsetY;
     // Bg
     ctx.fillStyle = "black";
     ctx.imageSmoothingEnabled = false;
@@ -167,6 +166,7 @@ function MazeMinigameGame(props: {
         // Render
         const tile = floorPlan[y][x];
         if (tile == 'x') {
+          // Wall
           ctx.fillStyle = "gray";
           renderAtCoord(x, y, ctx);
         } else if (tile == 'D') {
@@ -184,7 +184,6 @@ function MazeMinigameGame(props: {
           }
           renderAtCoord(x, y, ctx, 1, 2);
           for (let i = 0; i < 0.99; i += 0.2) {
-            // TODO: different style for going upstairs vs downstairs
             let alphapercent = 1 - (i / 2);
             if (player.current.floor == 2) {
               if (y > 0 && floorPlan[y - 1][x] == 'S') {
@@ -259,57 +258,34 @@ function MazeMinigameGame(props: {
       }
     }
     // UI
-    if (timer) {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-      ctx.beginPath();
-      ctx.roundRect(width - 130, 20, 74, 30, 8);
-      ctx.fill();
-      ctx.fillStyle = "orange";
-      const { minLeft, secLeft } = timeUntil(timer.current ?? 0);
+    if (endTime) {
+      renderRoundRect(ctx, width - 130, 20, 76, 30, "rgba(0, 0, 0, 0.6)");
+      const { minLeft, secLeft } = timeUntil(endTime.current ?? 0);
       const formatTime = minLeft + ":" + (secLeft < 10 ? '0' : '') + secLeft;
+      ctx.fillStyle = "orange";
       ctx.font="28px Arial";
       ctx.fillText(formatTime, width - 120, 44);
     }
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.beginPath();
-    ctx.roundRect(30, 20, 400, 30, 8);
-    ctx.fill();
+    renderRoundRect(ctx, 30, 20, 400, 30, "rgba(0, 0, 0, 0.2)");
     const playerRoomName = player.current.floor == 2 ? ROOMS_2[playerRoom] : ROOMS_1[playerRoom];
+    ctx.fillStyle = "white";
+    ctx.font="22px Arial";
     if (playerRoomName) {
-      ctx.fillStyle = "white";
-      ctx.font="22px Arial";
       ctx.fillText("FLOOR " + player.current.floor + " - " + playerRoomName, 40, 42);
     } else {
-      ctx.fillStyle = "white";
-      ctx.font="22px Arial";
       ctx.fillText("FLOOR " + player.current.floor, 40, 42);
     }
-    const fillActive = "rgba(70, 100, 240, 0.8)";
-    const fillInactive = "rgba(0, 0, 0, 0.2)";
-    const diamondY = 90; //height - 80;
+    const diamondFillActive = "rgba(70, 100, 240, 0.8)";
+    const diamondFillInactive = "rgba(0, 0, 0, 0.2)";
     const diamondX = 20;
+    const diamondY = 90;
     const diamondH = 40;
     const diamondW = 80;
     const diamondOffset = 14;
-    ctx.beginPath();
-    ctx.moveTo(diamondX, diamondY + diamondH / 2);
-    ctx.lineTo(diamondX + diamondW / 2, diamondY);
-    ctx.lineTo(diamondX + diamondW, diamondY + diamondH / 2);
-    ctx.lineTo(diamondX + diamondW / 2, diamondY + diamondH);
-    ctx.lineTo(diamondX, diamondY + diamondH / 2);
-    ctx.closePath();
-    ctx.fillStyle = player.current.floor == 1 ? fillActive : fillInactive;
-    ctx.fill();
-    ctx.beginPath();
-    const diamond2Y = diamondY - diamondOffset;
-    ctx.moveTo(diamondX, diamond2Y + diamondH / 2);
-    ctx.lineTo(diamondX + diamondW / 2, diamond2Y);
-    ctx.lineTo(diamondX + diamondW, diamond2Y + diamondH / 2);
-    ctx.lineTo(diamondX + diamondW / 2, diamond2Y + diamondH);
-    ctx.lineTo(diamondX, diamond2Y + diamondH / 2);
-    ctx.closePath();
-    ctx.fillStyle = player.current.floor == 2 ? fillActive : fillInactive;
-    ctx.fill();
+    const diamond1Style = player.current.floor == 1 ? diamondFillActive : diamondFillInactive;
+    renderDiamond(ctx, diamondX, diamondY, diamondW, diamondH, diamond1Style);
+    const diamond2Style = player.current.floor == 2 ? diamondFillActive : diamondFillInactive;
+    renderDiamond(ctx, diamondX, diamondY - diamondOffset, diamondW, diamondH, diamond2Style);
   }
 
   function handleKeys() {
@@ -372,14 +348,14 @@ function MazeMinigameGame(props: {
       player.current.beenTo.add(player.current.floor + '-' + tile);
     }
     if (pressed) {
-      cooldown.current = Date.now() + 70;
+      cooldown.current = Date.now() + 75;
       // Animate the character
       player.current.walkingStep = 1 - player.current.walkingStep;
     }
   }
 
   function checkEndConditions() {
-    const { minLeft, secLeft } = timeUntil(timer.current ?? 0);
+    const { minLeft, secLeft } = timeUntil(endTime.current ?? 0);
     const gameLost = minLeft < 0 || (minLeft == 0 && secLeft <= 0);
     if (gameLost) {
       lose();
@@ -433,7 +409,7 @@ function MazeMinigameGame(props: {
   useEffect(() => {
     // Start the game the moment this is first rendered
     const GAME_DURATION_SECONDS = 80;
-    timer.current = Date.now() + GAME_DURATION_SECONDS * 1000;
+    endTime.current = Date.now() + GAME_DURATION_SECONDS * 1000;
   }, []);
 
   return (
