@@ -10,7 +10,7 @@ import ImageQuestionMark from "../assets/QuestionMark.png";
 import type {
   Objective,
   Player,
-  KeysPressed,
+  ControlsPressed,
   ScreenName
 } from "./types";
 import {
@@ -22,6 +22,8 @@ import {
   ROOMS_1_QCOORDS,
   TARGET,
   OBJECTIVES_DEFAULT,
+  TILE_WIDTH,
+  CONTROLS
 } from "./constants.ts";
 import { timeUntil, renderDiamond, renderRoundRect } from "./utils.ts";
 
@@ -59,7 +61,7 @@ function MazeMinigameGame(props: {
   const [objectives, setObjectives] = useState(OBJECTIVES_DEFAULT);
 
   // Using ref to prevent issues with useEffect
-  const keysPressed = useRef<KeysPressed>({});
+  const controlsPressed = useRef<ControlsPressed>({});
   const cooldown = useRef(0);
   const offsetX = useRef(0);
   const offsetY = useRef(0);
@@ -68,6 +70,8 @@ function MazeMinigameGame(props: {
 
   const canvas = useRef<null | HTMLCanvasElement>(null);
   const canvasWrapper = useRef<null | HTMLDivElement>(null);
+
+  // Assets must be accessed through refs for efficiency
   const assetStudentCenter = useRef<null | HTMLImageElement>(null);
   const assetStudentCenterInterior = useRef<null | HTMLImageElement>(null);
   const assetPetr = useRef<null | HTMLImageElement>(null);
@@ -97,23 +101,11 @@ function MazeMinigameGame(props: {
     }
   });
 
-  const tileWidth = 36;
-  const controls: Record<string, string> = {
-    'w': 'up',
-    'a': 'left',
-    's': 'down',
-    'd': 'right',
-    'ArrowUp': 'up',
-    'ArrowLeft': 'left',
-    'ArrowDown': 'down',
-    'ArrowRight': 'right'
-  }
-
   function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0, img: CanvasImageSource | null = null) {
-    const realX = Math.floor((offsetX.current + x) * tileWidth);
-    const realY = Math.floor((offsetY.current + y) * tileWidth);
-    const realWidth = w * tileWidth + 1;
-    const realHeight = h * tileWidth + 1;
+    const realX = Math.floor((offsetX.current + x) * TILE_WIDTH);
+    const realY = Math.floor((offsetY.current + y) * TILE_WIDTH);
+    const realWidth = w * TILE_WIDTH + 1;
+    const realHeight = h * TILE_WIDTH + 1;
     // Skip rendering if this item is fully off-screen
     if (realX + realWidth < 0 || realY + realHeight < 0 || realX > ctx.canvas.width || realY > ctx.canvas.height) {
       return;
@@ -135,8 +127,8 @@ function MazeMinigameGame(props: {
     canvas.current!.width = width;
     // Determine the offset based on the player's position
     const offsetRatio = 0.15;
-    const screenWidthTiles = width / tileWidth - 1;
-    const screenHeightTiles = height / tileWidth - 1;
+    const screenWidthTiles = width / TILE_WIDTH - 1;
+    const screenHeightTiles = height / TILE_WIDTH - 1;
     const newOffsetX = (screenWidthTiles / 2 - player.current.x)
       * offsetRatio + offsetX.current * (1 - offsetRatio);
     const newOffsetY = (screenHeightTiles / 2 - player.current.y)
@@ -291,7 +283,7 @@ function MazeMinigameGame(props: {
   function handleKeys() {
     const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
     let pressed = false;
-    for (const control of Object.keys(keysPressed.current)) {
+    for (const control of Object.keys(controlsPressed.current)) {
       const playerOrigY = player.current.y;
       const playerOrigX = player.current.x;
       // Movement
@@ -384,11 +376,11 @@ function MazeMinigameGame(props: {
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    keysPressed.current![controls[event.key]] = true;
+    controlsPressed.current![CONTROLS[event.key]] = true;
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    delete keysPressed.current![controls[event.key]];
+    delete controlsPressed.current![CONTROLS[event.key]];
   }
 
   useEffect(() => {

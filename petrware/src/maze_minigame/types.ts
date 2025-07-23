@@ -9,7 +9,6 @@ export type Player = {
   beenTo: Set<string>
 }
 
-export type KeysPressed = {[key: string]: true};
+export type ControlsPressed = {[control: string]: true};
 
 export type ScreenName = "instructions" | "game" | "win" | "lose";
-

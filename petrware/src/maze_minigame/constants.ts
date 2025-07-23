@@ -77,26 +77,6 @@ export const ROOMS_1: Record<string, string> = {
   'f': 'Pacific Ballroom'
 };
 
-export const TARGET = {
-  floor: 2,
-  tile: 'u'
-}
-
-export const OBJECTIVES_DEFAULT: Objective[] = [
-  {
-    text: "Find your water bottle in the East Food Court",
-    complete: false
-  },
-  {
-    text: "Find your backpack at Emerald Bay",
-    complete: false
-  },
-  {
-    text: "Escape the student center (get back to Ring Road)",
-    complete: false
-  }
-];
-
 export const ROOMS_2_QCOORDS: Record<string, { x: number, y: number }> = {
   '1': { x: 4, y: 5 },
   '2': { x: 21, y: 3 },
@@ -124,3 +104,35 @@ export const ROOMS_1_QCOORDS: Record<string, { x: number, y: number }> = {
   'e': { x: 11, y: 16 },
   'f': { x: 37, y: 18 },
 };
+
+export const TARGET = {
+  floor: 2,
+  tile: 'u'
+}
+
+export const OBJECTIVES_DEFAULT: Objective[] = [
+  {
+    text: "Find your water bottle in the East Food Court",
+    complete: false
+  },
+  {
+    text: "Find your backpack at Emerald Bay",
+    complete: false
+  },
+  {
+    text: "Escape the student center (get back to Ring Road)",
+    complete: false
+  }
+];
+
+export const TILE_WIDTH = 36;
+export const CONTROLS: Record<string, string> = {
+  'w': 'up',
+  'a': 'left',
+  's': 'down',
+  'd': 'right',
+  'ArrowUp': 'up',
+  'ArrowLeft': 'left',
+  'ArrowDown': 'down',
+  'ArrowRight': 'right'
+}
