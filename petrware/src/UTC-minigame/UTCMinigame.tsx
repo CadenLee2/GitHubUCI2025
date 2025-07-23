@@ -22,12 +22,32 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     const assetTooFastScreen = useRef<null | HTMLImageElement>(null);
     const assetTooSlowScreen = useRef<null | HTMLImageElement>(null);
     const assetSuccessScreen = useRef<null | HTMLImageElement>(null);
+    const timer = useRef<null | number>(null); 
     let currScreen = useRef<CanvasImageSource>(null);
+
+    
+    
+    function handleMouseEvent(event: MouseEvent){
+        event.preventDefault();
+        
+        let startY = event.clientY;
+        console.log(event);
+        console.log(startY);
+        console.log(cardy);
+        setCardY(startY -42);
+    }
+
+    function startTimer(){
+        const GAME_DURATION = 60 * 1000;
+        timer.current = Date.now() + GAME_DURATION;
+    }
 
     function animate(){
         setCardX(cardx + 1);
-        if(cardx == 240){
+        if(cardx == 750){
             setAnimationState(1);
+            canvas.current!.onmousedown = handleMouseEvent;
+            startTimer();
         }
     }
 
@@ -46,21 +66,20 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         }
 
         ctx.drawImage(
-            assetTopWallet!.current as CanvasImageSource, 123/5, 0, 86/5, 574/5
+            assetTopWallet!.current as CanvasImageSource, 123, 0, 86, 574
         )
         ctx.drawImage(
-            assetCard!.current as CanvasImageSource, cardx, cardy, 135/5, 220/5
+            assetCard!.current as CanvasImageSource, cardx, cardy, 135, 220
         );
         ctx.drawImage(
-            assetBotWallet!.current as CanvasImageSource,0,0,123/5,572/5
+            assetBotWallet!.current as CanvasImageSource,0,0,123,572
         );
         ctx.drawImage(
-            currScreen!.current as CanvasImageSource, 140, 40, 356/3, 234/3
+            currScreen!.current as CanvasImageSource, 500, 160, 356, 234
         )
     }
     
     useEffect(() => {
-        console.log('hi');
         currScreen = assetSwipeScreen;
         render();
 
@@ -74,7 +93,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     return(
     <>
         <div id="canvasWrapper">
-        <canvas id="canvas" ref={canvas}></canvas>
+        <canvas id="canvas" ref={canvas} width={936} height={655}></canvas>
         </div>
         <div id="assets">
             <img src={card} ref={assetCard}/>
