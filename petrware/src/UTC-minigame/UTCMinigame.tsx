@@ -9,11 +9,9 @@ import tooSlowScreen from "../assets/TooSlow.png";
 import successScreen from "../assets/Success.png";
 
 export default function UTCMinigame(props: { finishGame: (pointsWon: number) => void }) {
-    const [screenState, setScreenState] = useState(0);
     const [animationState, setAnimationState] = useState(0);
     const [cardx, setCardX] = useState(0);
     let cardy = useRef<number>(0);
-    let checks = 0;
 
     const canvas = useRef<null | HTMLCanvasElement>(null);
     const assetCard = useRef<HTMLImageElement>(null);
@@ -28,7 +26,8 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     let is_dragging = false;
     let startY = 0;
     let startX = 0;
-    let time = 0;
+    let time = useRef<number>(0);
+    let timeEnd = useRef<number>(0);
 
     function mouseOnCard(x:number, y:number){
         const leftBuffer = (window.innerWidth - 936)/2;
@@ -62,6 +61,8 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         }
         is_dragging = false;
         cardy.current = 0;
+        time.current = 0;
+        timeEnd.current = 0;
         render();
     }
 
@@ -81,13 +82,37 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
             return;
         }
         else{
-            if(startY != -1){
-                event.preventDefault();
-                let mouseY = event.clientY;
-                
-                let dy = mouseY - startY;
+            event.preventDefault();
+            let mouseY = event.clientY;
+            
+            let dy = mouseY - startY;
+            if(dy > 0){
                 cardy.current=dy;
             }
+            if(dy < 384 && dy > 160){
+                if(!timeEnd.current){
+                    time.current += 1;
+                }
+                //40
+            }
+            if(dy > 384){
+                timeEnd.current = 1;
+                console.log(time.current);
+                check();
+            }
+
+        }
+    }
+
+    function check(){
+        if(time.current < 40){
+            currScreen.current = assetTooFastScreen.current;
+        }
+        else if(time.current > 60){
+            currScreen.current = assetTooSlowScreen.current;
+        }
+        else{
+            currScreen.current = assetSuccessScreen.current;
         }
     }
 
@@ -147,11 +172,6 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
             window.clearInterval(intervalId);
         }
     });
-
-    useEffect(() => {
-        console.log("hello");
-        render();
-    },[checks])
 
     return(
     <>
