@@ -220,7 +220,6 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     );
     // Collectibles
     for (const [colName, colData] of Object.entries(collectibles.current)) {
-      console.log(colData);
       if (player.current.hasCollectibles.has(colName)) {
         // Player holding
         renderAtCoord(
@@ -247,7 +246,11 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     }
     // UI
     if (timer) {
-      ctx.fillStyle = "red";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.beginPath();
+      ctx.roundRect(width - 130, 20, 74, 30, 8);
+      ctx.fill();
+      ctx.fillStyle = "orange";
       const timeLeft = (timer.current ?? 0) - Date.now();
       const secLeftTotal = Math.floor(timeLeft / 1000);
       const minLeft = Math.floor(secLeftTotal / 60);
@@ -256,16 +259,46 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       ctx.font="28px Arial";
       ctx.fillText(formatTime, width - 120, 44);
     }
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.beginPath();
+    ctx.roundRect(30, 20, 400, 30, 8);
+    ctx.fill();
     const playerRoomName = player.current.floor == 2 ? ROOMS_2[playerRoom] : ROOMS_1[playerRoom];
     if (playerRoomName) {
       ctx.fillStyle = "white";
-      ctx.font="24px Arial";
-      ctx.fillText("FLOOR " + player.current.floor + " - " + playerRoomName, 40, 40);
+      ctx.font="22px Arial";
+      ctx.fillText("FLOOR " + player.current.floor + " - " + playerRoomName, 40, 42);
     } else {
       ctx.fillStyle = "white";
-      ctx.font="24px Arial";
-      ctx.fillText("FLOOR " + player.current.floor, 40, 40);
+      ctx.font="22px Arial";
+      ctx.fillText("FLOOR " + player.current.floor, 40, 42);
     }
+    const fillActive = "rgba(70, 100, 240, 0.8)";
+    const fillInactive = "rgba(0, 0, 0, 0.2)";
+    const diamondY = 90; //height - 80;
+    const diamondX = 20;
+    const diamondH = 40;
+    const diamondW = 80;
+    const diamondOffset = 14;
+    ctx.beginPath();
+    ctx.moveTo(diamondX, diamondY + diamondH / 2);
+    ctx.lineTo(diamondX + diamondW / 2, diamondY);
+    ctx.lineTo(diamondX + diamondW, diamondY + diamondH / 2);
+    ctx.lineTo(diamondX + diamondW / 2, diamondY + diamondH);
+    ctx.lineTo(diamondX, diamondY + diamondH / 2);
+    ctx.closePath();
+    ctx.fillStyle = player.current.floor == 1 ? fillActive : fillInactive;
+    ctx.fill();
+    ctx.beginPath();
+    const diamond2Y = diamondY - diamondOffset;
+    ctx.moveTo(diamondX, diamond2Y + diamondH / 2);
+    ctx.lineTo(diamondX + diamondW / 2, diamond2Y);
+    ctx.lineTo(diamondX + diamondW, diamond2Y + diamondH / 2);
+    ctx.lineTo(diamondX + diamondW / 2, diamond2Y + diamondH);
+    ctx.lineTo(diamondX, diamond2Y + diamondH / 2);
+    ctx.closePath();
+    ctx.fillStyle = player.current.floor == 2 ? fillActive : fillInactive;
+    ctx.fill();
   }
 
   function handleKeys() {
@@ -371,7 +404,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   return (
     <div className="main-container">
       <div>
-        <span>You accidentally left your backpack in Emerald Bay!</span>
+        <span>You accidentally left some of your belongings in the Student Center!</span>
         <div className="quests">
           {
             objectives.map((obj, i) => 
