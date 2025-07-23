@@ -12,51 +12,81 @@ type Player = {
   walkingStep: number
 }
 
-type KeysPressed = {[key: string]: number};
+type KeysPressed = {[key: string]: true};
 
 const STUDENT_CENTER_FLOOR_2 = [
-  "                x        x       x                 x                     ",
-  "                x        x       x                 x                     ",
-  "                xSx      x       x                 x                  xxx",
-  "                xSx      x       x                 x                  x  ",
-  "                xxx      xxxxxxxxx                 x                xxx  ",
-  "                D            x   x                x               xSx    ",
-  "                x       xSxDxx   xxxxxxxxxxxxxxxxxxx              xSx    ",
-  "                x       xSx  xxx x      x          x              x  xxxx",
-  "                xxxxxDxxxx x   x x      x          xxx            x      ",
-  "xxxxx           x          xxxxxDx      x            x         xxxxxxxxxx",
-  "     xxxxxxxxDxxx                x  xDx x            D        x          ",
-  "                                  xx   x xx          x        x          ",
-  "                                           xx        x     xxxx     xxxxx",
-  "                                             xx      x    x         x    ",
-  "        xxDx                                   xDxxDDx   x xxx      D    ",
-  "      xx    xx                                       x   x   x      x    ",
-  "    xx        xxxxxDxxxxxxx                        xSx   x   xxxxxxxx    ",
-  "  xx          x            x                       xSxDxxxxxxx           ",
-  "xx            x             x                       x                    ",
+  "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
+  "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
+  "1111111111111111xSx222222x3333333x44444444444444444x555555555555555555xxx",
+  "1111111111111111xSx222222x3333333x44444444444444444x555555555555555555x  ",
+  "1111111111111111xxx222222xxDxxxxxx44444444444444444x5555555555555555xxx  ",
+  "1111111111111111D222222222222xaaax4444444444444444x 55555555555555xSx    ",
+  "1111111111111111x2222222xSxDxxaaaxxxxxxxxxxxxxxxxxxx55555555555555xSx    ",
+  "1111111111111111x2222222xSxaaaaxax777777x8888888888x55555555555555x55xxxx",
+  "1111111111111111xxxxxDxxxx9xaaaxax777777x8888888888xxx555555555555x555555",
+  "xxxxx11111111111x9999999999xxxxxDx777777x888888888888x555555555xxxxxxxxxx",
+  "99999xxxxxxxxDxxx9999999999999999x77xDx7x888888888888D55555555x6666666666",
+  "9999999999999999999999999999999999xx999x9xx8888888888x55555555x6666666666",
+  "9999999999999999999999999999999999999999999xx88888888x55555xxxx66666xxxxx",
+  "999999999999999999999999999999999999999999999xx888888x5555x666666666x9999",
+  "99999999xxDx99999999999999999999999999999999999xDxxDDx555x xxx666666D9999",
+  "999999xx    xx999999999999999999999999999999999999999x555x   x666666x9999",
+  "9999xx        xxxxxDxxxxxxx999999999999999999999999xSx555x   xxxxxxxx9999",
+  "99xx          x            x99999999999999999999999xSxDxxxxxxx99999999999",
+  "xx            x             x99999999999999999999999x99999999999999999999",
 ];
 
 const STUDENT_CENTER_FLOOR_1 = [
-  "    x           x       x        x                 x                     ",
-  "xxxxx    xxxxxxxxxx     x        x                 x                     ",
-  "    x    x      xSx     x        x                 x              xxxxxxx",
-  "    D    D      xSx     x        x                 D              x   x  ",
-  "    x    x      x       x        x                 x              x xxx  ",
-  "    D    D      x       xxxDxxxxxx                x               xSx    ",
-  "    x    x      x       xSx xx   xxxDDxxxxxDxxxxxxxx              xSx    ",
-  "xxxx      xxxxxxx       xSx  xxx x      x          x                 xxxx",
-  "                xxxxxDxxx      x x      x          xxx                   ",
-  "xxxxx           x                x      x            xxxxxx    xxxxxxxxxx",
-  "     xxxxxxxxDxxx       xxDxxDxxDx      x            x     x  x   x      ",
-  "                        x        x       xx          x     x  x   x      ",
-  "                        xxDxxDxxDx         xx        D     xxxx    xxxxxx",
-  "          xxx                                xx      x    x   x          ",
-  "        xx   xDx                               xDxxDxx   x    xxxxxx     ",
-  "      Dx        xxx                 xx             xSxDDDx    x          ",
-  "    xx             xDx            xx  xxx          xSx   x    xxxxxx     ",
-  "  xx                  xxx       DD       xxx             D               ",
-  "xx                       xDx  xx            xxx          x               ",
+  "    x33333333333x4444444x55555555x66666666666666666xddddddddddddddddddddd",
+  "xxxxx3333xxxxxxxxxx44444x55555555x66666666666666666xddddddddddddddddddddd",
+  "1111x3333x222222xSx44444x55555555x66666666666666666xddddddddddddddxxxxxxx",
+  "1111D3333D222222xSx44444x55555555x66666666666666666Dddddddddddddddxdddxbb",
+  "1111x3333x222222x4444444x55555555x66666666666666666xddddddddddddddxdxxxbb",
+  "1111D3333D222222x4444444xxxDxxxxxx6666666666666666xdddddddddddddddxSxbbbb",
+  "1111x3333x222222x4444444xSx xx   xxxDDxxxxxDxxxxxxxxddddddddddddddxSxbbbb",
+  "xxxx333333xxxxxxx4444444xSx  xxx x      x8888888888xdddddddddddddddddxxxx",
+  "3333333333333333xxxxxDxxx      x x      x8888888888xxxddddddddddddddddddd",
+  "xxxxx33333333333x                x      x888888888888xxxxxxddddxxxxxxxxxx",
+  "     xxxxxxxxDxxx       xxDxxDxxDx      x888888888888x99999xddxcccx      ",
+  "                        x77777777x       xx8888888888x99999xddxcccx      ",
+  "                        xxDxxDxxDx         xx88888888D99999xxxxccccxxxxxx",
+  "          xxx                                xx888888x9999xcccxcccccccccc",
+  "        xxeeexDx                               xDxxDxx999xccccxxxxxxccccc",
+  "      Dxeeeeeeeexxx                 xx             xSxDDDxccccxcccccccccc",
+  "    xxeeeeeeeeeeeeexDx            xxffxxx          xSx   xccccxxxxxxccccc",
+  "  xxeeeeeeeeeeeeeeeeeexxx       DDfffffffxxx             Dccccccccccccccc",
+  "xxeeeeeeeeeeeeeeeeeeeeeeexDx  xxffffffffffffxxx          xccccccccccccccc",
 ];
+
+const ROOMS_2: Record<string, string> = {
+  '1': 'West Food Court',
+  '2': 'Student Center Lobby',
+  '3': 'Crystal Cove Auditorium',
+  '5': 'UCI Bookstore',
+  '6': 'Starbucks',
+  '7': 'Anthill Pub and Grill',
+  '8': 'East Food Court',
+  '9': 'Terrace',
+  ' ': 'Esports Arena',
+  'a': 'Restrooms'
+}
+
+const ROOMS_1: Record<string, string> = {
+  '1': 'Doheny Beach Meeting Rooms',
+  '2': 'Emerald Bay Meeting Rooms',
+  '3': 'Gallery Lounge',
+  '4': 'Crystal Cove Lounge',
+  '5': 'Crystal Cove Auditorium',
+  '6': 'Empty Room',
+  '7': 'Crescent Bay Rooms',
+  '8': 'Computer Lab',
+  '9': 'CSL Patio',
+  'c': 'Courtyard Study Lounge',
+  ' ': 'Hallway',
+  'd': 'UCI Bookstore',
+  'e': 'West Courtyard',
+  'f': 'Pacific Ballroom'
+};
 
 export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
   const player = useRef<Player>({
@@ -67,7 +97,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   });
 
   // Using ref to prevent issues with useEffect
-  const [keysPressed, setKeysPressed] = useState<KeysPressed>({});
+  const keysPressed = useRef<KeysPressed>({});
   const cooldown = useRef(0);
   const offsetX = useRef(0);
   const offsetY = useRef(0);
@@ -86,7 +116,11 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     'w': 'up',
     'a': 'left',
     's': 'down',
-    'd': 'right'
+    'd': 'right',
+    'ArrowUp': 'up',
+    'ArrowLeft': 'left',
+    'ArrowDown': 'down',
+    'ArrowRight': 'right'
   }
 
   function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0, img: CanvasImageSource | null = null) {
@@ -128,17 +162,15 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       ctx.drawImage(assetStudentCenterInterior!.current as CanvasImageSource, 0, 0, width, height);
     }
     ctx.globalAlpha = 1.0;
-    // Floor plan
-    // TODO: allow multiple floors
+    // Floor plan is based on the player's current floor
     const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
+    // Identify which room the player is in
+    const playerRoom = floorPlan[player.current.y][player.current.x];
     for (let y = 0; y < floorPlan.length; y++) {
       for (let x = 0; x < floorPlan[y].length; x++) {
         // Render
         const tile = floorPlan[y][x];
-        if (tile == ' ') {
-          ctx.fillStyle = "beige";
-          renderAtCoord(x, y, ctx);
-        } else if (tile == 'x') {
+        if (tile == 'x') {
           ctx.fillStyle = "gray";
           renderAtCoord(x, y, ctx);
         } else if (tile == 'D') {
@@ -171,16 +203,21 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
               }
             }
             ctx.fillStyle = "rgba(150, 150, 150, " + alphapercent + ")";
-            renderAtCoord(x, y + i, ctx, 1, 0.1);
+            renderAtCoord(x, y + i, ctx, 1, 0.09);
             ctx.fillStyle = "rgba(200, 200, 200, " + alphapercent + ")";
-            renderAtCoord(x, y + i + 0.1, ctx, 1, 0.1);
+            renderAtCoord(x, y + i + 0.09, ctx, 1, 0.09);
           }
+        } else if (tile == playerRoom) {
+          // Bright
+          ctx.fillStyle = "beige";
+          renderAtCoord(x, y, ctx);
+        } else {
+          ctx.fillStyle = "#c4c4b4";
+          renderAtCoord(x, y, ctx);
         }
       }
     }
     // Player
-    // TODO: draw an image of the player instead?
-    ctx.fillStyle = "red";
     renderAtCoord(
       player.current.x - 0.4, 
       player.current.y - 0.4, 
@@ -193,6 +230,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     );
     // UI
     if (timer) {
+      ctx.fillStyle = "red";
       const timeLeft = (timer.current ?? 0) - Date.now();
       const secLeftTotal = Math.floor(timeLeft / 1000);
       const minLeft = Math.floor(secLeftTotal / 60);
@@ -201,13 +239,22 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       ctx.font="24px Arial";
       ctx.fillText(formatTime, width - 180, 40);
     }
+    const playerRoomName = player.current.floor == 2 ? ROOMS_2[playerRoom] : ROOMS_1[playerRoom];
+    if (playerRoomName) {
+      ctx.fillStyle = "white";
+      ctx.font="24px Arial";
+      ctx.fillText("FLOOR " + player.current.floor + " - " + playerRoomName, 40, 40);
+    } else {
+      ctx.fillStyle = "white";
+      ctx.font="24px Arial";
+      ctx.fillText("FLOOR " + player.current.floor, 40, 40);
+    }
   }
 
   function handleKeys() {
     const floorPlan = player.current.floor == 2 ? STUDENT_CENTER_FLOOR_2 : STUDENT_CENTER_FLOOR_1;
     let pressed = false;
-    for (const key of Object.keys(keysPressed)) {
-      const control = controls[key];
+    for (const control of Object.keys(keysPressed.current)) {
       const playerOrigY = player.current.y;
       const playerOrigX = player.current.x;
       // Movement
@@ -259,15 +306,11 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   }
 
   function handleKeyDown(event: KeyboardEvent) {
-    const newKeysPressed = JSON.parse(JSON.stringify(keysPressed));
-    newKeysPressed[event.key] = true;
-    setKeysPressed(newKeysPressed);
+    keysPressed.current![controls[event.key]] = true;
   }
 
   function handleKeyUp(event: KeyboardEvent) {
-    const newKeysPressed = JSON.parse(JSON.stringify(keysPressed));
-    delete newKeysPressed[event.key];
-    setKeysPressed(newKeysPressed);
+    delete keysPressed.current![controls[event.key]];
   }
 
   useEffect(() => {
@@ -275,8 +318,6 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     // Handle keybinds
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-    // Initial render
-    render();
     // Call on each "frame"
     const intervalId = window.setInterval(frame, 10);
     // Cleanup
