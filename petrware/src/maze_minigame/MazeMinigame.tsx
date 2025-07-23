@@ -5,6 +5,7 @@ import ImageStudentCenterInterior from "../assets/studentCenterInterior.png";
 import ImagePetr from "../assets/PetrCharacter.png";
 import ImagePetr2 from "../assets/PetrCharacter2.png";
 import ImageBackpack from "../assets/Backpack.png";
+import ImageWaterBottle from "../assets/WaterBottle.png";
 import ImageQuestionMark from "../assets/QuestionMark.png";
 import {
   STUDENT_CENTER_FLOOR_2,
@@ -20,7 +21,7 @@ type Player = {
   y: number,
   floor: number,
   walkingStep: number,
-  hasBackpack: boolean,
+  hasCollectibles: Set<string>,
   beenTo: Set<string>
 }
 
@@ -32,11 +33,23 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
     y: 17,
     floor: 2,
     walkingStep: 0,
-    hasBackpack: false,
+    hasCollectibles: new Set<string>(),
     beenTo: new Set<string>()
   });
-
-  const backpackCoords = useRef({ x: 14, y: 4, floor: 1 } );
+  const [objectives, setObjectives] = useState([
+    {
+      text: "Find your water bottle in the East Food Court",
+      complete: false
+    },
+    {
+      text: "Find your backpack at Emerald Bay",
+      complete: false
+    },
+    {
+      text: "Escape the student center (get to Ring Road)",
+      complete: false
+    }
+  ]);
 
   // Using ref to prevent issues with useEffect
   const keysPressed = useRef<KeysPressed>({});
@@ -53,7 +66,29 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const assetPetr = useRef<null | HTMLImageElement>(null);
   const assetPetr2 = useRef<null | HTMLImageElement>(null);
   const assetBackpack = useRef<null | HTMLImageElement>(null);
+  const assetWaterBottle = useRef<null | HTMLImageElement>(null);
   const assetQuestionMark = useRef<null | HTMLImageElement>(null);
+
+  const collectibles = useRef({
+    "backpack": {
+      x: 14,
+      y: 4,
+      floor: 1,
+      objectiveFinish: 1,
+      asset: assetBackpack,
+      offsetX: 0.2,
+      offsetY: 0.2
+    },
+    "waterBottle": {
+      x: 42,
+      y: 8,
+      floor: 2,
+      objectiveFinish: 0,
+      asset: assetWaterBottle,
+      offsetX: -0.6,
+      offsetY: 0.2
+    }
+  });
 
   const tileWidth = 36;
   const controls: Record<string, string> = {
@@ -70,8 +105,10 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   function renderAtCoord(x: number, y: number, ctx: CanvasRenderingContext2D, w = 1.0, h = 1.0, img: CanvasImageSource | null = null) {
     // Determine the offset based on the player's position
     const offsetRatio = 0.0001;
-    const newOffsetX = (13 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
-    const newOffsetY = (9 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
+    const screenWidthTiles = ctx.canvas.width / tileWidth - 1;
+    const screenHeightTiles = ctx.canvas.height / tileWidth - 1;
+    const newOffsetX = (screenWidthTiles / 2 - player.current.x) * offsetRatio + offsetX.current * (1 - offsetRatio);
+    const newOffsetY = (screenHeightTiles / 2 - player.current.y) * offsetRatio + offsetY.current * (1 - offsetRatio);
     offsetX.current = newOffsetX;
     offsetY.current = newOffsetY;
     const realX = Math.floor((newOffsetX + x) * tileWidth);
@@ -162,7 +199,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
           renderAtCoord(x, y, ctx);
           const showQuestionMark = (
             qCoords[tile] && x == qCoords[tile].x && y == qCoords[tile].y
-            && !player.current.beenTo.has(tile)
+            && !player.current.beenTo.has(player.current.floor + '-' + tile)
           );
           if (showQuestionMark) {
             renderAtCoord(x, y, ctx, 1, 1, assetQuestionMark.current as CanvasImageSource);
@@ -181,28 +218,32 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         assetPetr!.current as CanvasImageSource :
         assetPetr2!.current as CanvasImageSource
     );
-    // Backpack
-    if (player.current.hasBackpack) {
-      renderAtCoord(
-        player.current.x + 0.2, 
-        player.current.y + 0.2, 
-        ctx, 
-        1.1, 
-        1.1, 
-        assetBackpack!.current as CanvasImageSource
-      );
-    } else if (
-      backpackCoords.current.floor == player.current.floor
-      && playerRoom == floorPlan[backpackCoords.current.y][backpackCoords.current.x]
-    ) {
-      renderAtCoord(
-        backpackCoords.current.x - 0.2, 
-        backpackCoords.current.y - 0.2, 
-        ctx, 
-        1.4, 
-        1.4, 
-        assetBackpack!.current as CanvasImageSource
-      );
+    // Collectibles
+    for (const [colName, colData] of Object.entries(collectibles.current)) {
+      console.log(colData);
+      if (player.current.hasCollectibles.has(colName)) {
+        // Player holding
+        renderAtCoord(
+          player.current.x + colData.offsetX, 
+          player.current.y + colData.offsetY, 
+          ctx, 
+          1.1, 
+          1.1, 
+          colData.asset.current as CanvasImageSource
+        );
+      } else if (
+        colData.floor == player.current.floor
+        && playerRoom == floorPlan[colData.y][colData.x]
+      ) {
+        renderAtCoord(
+          colData.x - 0.2, 
+          colData.y - 0.2, 
+          ctx, 
+          1.4, 
+          1.4, 
+          colData.asset.current as CanvasImageSource
+        );
+      }
     }
     // UI
     if (timer) {
@@ -268,16 +309,23 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         if (player.current.floor == 2) player.current.floor = 1;
         else player.current.floor = 2;
       }
-      const gotBackpack = (
-        player.current.x == backpackCoords.current.x
-        && player.current.y == backpackCoords.current.y
-        && player.current.floor == backpackCoords.current.floor
-        && !player.current.hasBackpack
-      );
-      if (gotBackpack) {
-        player.current.hasBackpack = true;
+      // Collision of collectibles
+      for (const [colName, colData] of Object.entries(collectibles.current)) {
+        const gotCol = (
+          !player.current.hasCollectibles.has(colName)
+          && player.current.x == colData.x
+          && player.current.y == colData.y
+          && player.current.floor == colData.floor
+        );
+        if (gotCol) {
+          const newObjectives = objectives.slice();
+          newObjectives[colData.objectiveFinish].complete = true;
+          setObjectives(newObjectives);
+          player.current.hasCollectibles.add(colName);
+        }
       }
-      player.current.beenTo.add(tile);
+      // Store the player's been here
+      player.current.beenTo.add(player.current.floor + '-' + tile);
     }
     if (pressed) {
       cooldown.current = Date.now() + 70;
@@ -322,21 +370,23 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
 
   return (
     <div className="main-container">
-      <div className="quests">
+      <div>
         <span>You accidentally left your backpack in Emerald Bay!</span>
-        <div className="quest">
-          <div className="checkbox">
-          </div>
-          <span>Find your backpack</span>
-        </div>
-        <div className="quest">
-          <div className="checkbox">
-          </div>
-          <span>Escape the student center (get to Ring Road)</span>
+        <div className="quests">
+          {
+            objectives.map((obj, i) => 
+              <div key={i} className="quest">
+                <div className={`checkbox ${obj.complete ? "checked" : ""}`}>
+                  {obj.complete && 'X'}
+                </div>
+                <span className={obj.complete ? "finished-text" : undefined}>{obj.text}</span>
+              </div>
+            )
+          }
         </div>
       </div>
       <div ref={canvasWrapper} className="canvas-wrapper">
-        <canvas ref={canvas} className="main-canvas" width={936} height={655}>
+        <canvas ref={canvas} className="main-canvas" width={936} height={615}>
         </canvas>
       </div>
       <div className="assets">
@@ -345,6 +395,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <img src={ImagePetr} ref={assetPetr} />
         <img src={ImagePetr2} ref={assetPetr2} />
         <img src={ImageBackpack} ref={assetBackpack} />
+        <img src={ImageWaterBottle} ref={assetWaterBottle} />
         <img src={ImageQuestionMark} ref={assetQuestionMark} />
       </div>
     </div>
