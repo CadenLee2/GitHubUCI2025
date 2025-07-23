@@ -4,97 +4,29 @@ import ImageStudentCenter from "../assets/studentCenter.png";
 import ImageStudentCenterInterior from "../assets/studentCenterInterior.png";
 import ImagePetr from "../assets/PetrCharacter.png";
 import ImagePetr2 from "../assets/PetrCharacter2.png";
+import ImageBackpack from "../assets/Backpack.png";
+import { STUDENT_CENTER_FLOOR_2, STUDENT_CENTER_FLOOR_1, ROOMS_2, ROOMS_1 } from "./Constants.ts";
 
 type Player = {
   x: number,
   y: number,
   floor: number,
-  walkingStep: number
+  walkingStep: number,
+  hasBackpack: boolean
 }
 
 type KeysPressed = {[key: string]: true};
 
-const STUDENT_CENTER_FLOOR_2 = [
-  "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
-  "1111111111111111x22222222x3333333x44444444444444444x555555555555555555555",
-  "1111111111111111xSx222222x3333333x44444444444444444x555555555555555555xxx",
-  "1111111111111111xSx222222x3333333x44444444444444444x555555555555555555x  ",
-  "1111111111111111xxx222222xxDxxxxxx44444444444444444x5555555555555555xxx  ",
-  "1111111111111111D222222222222xaaax4444444444444444x 55555555555555xSx    ",
-  "1111111111111111x2222222xSxDxxaaaxxxxxxxxxxxxxxxxxxx55555555555555xSx    ",
-  "1111111111111111x2222222xSxaaaaxax777777x8888888888x55555555555555x55xxxx",
-  "1111111111111111xxxxxDxxxx9xaaaxax777777x8888888888xxx555555555555x555555",
-  "xxxxx11111111111x9999999999xxxxxDx777777x888888888888x555555555xxxxxxxxxx",
-  "99999xxxxxxxxDxxx9999999999999999x77xDx7x888888888888D55555555x6666666666",
-  "9999999999999999999999999999999999xx999x9xx8888888888x55555555x6666666666",
-  "9999999999999999999999999999999999999999999xx88888888x55555xxxx66666xxxxx",
-  "999999999999999999999999999999999999999999999xx888888x5555x666666666x9999",
-  "99999999xxDx99999999999999999999999999999999999xDxxDDx555x xxx666666D9999",
-  "999999xx    xx999999999999999999999999999999999999999x555x   x666666x9999",
-  "9999xx        xxxxxDxxxxxxx999999999999999999999999xSx555x   xxxxxxxx9999",
-  "99xx          x            x99999999999999999999999xSxDxxxxxxx99999999999",
-  "xx            x             x99999999999999999999999x99999999999999999999",
-];
-
-const STUDENT_CENTER_FLOOR_1 = [
-  "    x33333333333x4444444x55555555x66666666666666666xddddddddddddddddddddd",
-  "xxxxx3333xxxxxxxxxx44444x55555555x66666666666666666xddddddddddddddddddddd",
-  "1111x3333x222222xSx44444x55555555x66666666666666666xddddddddddddddxxxxxxx",
-  "1111D3333D222222xSx44444x55555555x66666666666666666Dddddddddddddddxdddxbb",
-  "1111x3333x222222x4444444x55555555x66666666666666666xddddddddddddddxdxxxbb",
-  "1111D3333D222222x4444444xxxDxxxxxx6666666666666666xdddddddddddddddxSxbbbb",
-  "1111x3333x222222x4444444xSx xx   xxxDDxxxxxDxxxxxxxxddddddddddddddxSxbbbb",
-  "xxxx333333xxxxxxx4444444xSx  xxx x      x8888888888xdddddddddddddddddxxxx",
-  "3333333333333333xxxxxDxxx      x x      x8888888888xxxddddddddddddddddddd",
-  "xxxxx33333333333x                x      x888888888888xxxxxxddddxxxxxxxxxx",
-  "     xxxxxxxxDxxx       xxDxxDxxDx      x888888888888x99999xddxcccx      ",
-  "                        x77777777x       xx8888888888x99999xddxcccx      ",
-  "                        xxDxxDxxDx         xx88888888D99999xxxxccccxxxxxx",
-  "          xxx                                xx888888x9999xcccxcccccccccc",
-  "        xxeeexDx                               xDxxDxx999xccccxxxxxxccccc",
-  "      Dxeeeeeeeexxx                 xx             xSxDDDxccccxcccccccccc",
-  "    xxeeeeeeeeeeeeexDx            xxffxxx          xSx   xccccxxxxxxccccc",
-  "  xxeeeeeeeeeeeeeeeeeexxx       DDfffffffxxx             Dccccccccccccccc",
-  "xxeeeeeeeeeeeeeeeeeeeeeeexDx  xxffffffffffffxxx          xccccccccccccccc",
-];
-
-const ROOMS_2: Record<string, string> = {
-  '1': 'West Food Court',
-  '2': 'Student Center Lobby',
-  '3': 'Crystal Cove Auditorium',
-  '5': 'UCI Bookstore',
-  '6': 'Starbucks',
-  '7': 'Anthill Pub and Grill',
-  '8': 'East Food Court',
-  '9': 'Terrace',
-  ' ': 'Esports Arena',
-  'a': 'Restrooms'
-}
-
-const ROOMS_1: Record<string, string> = {
-  '1': 'Doheny Beach Meeting Rooms',
-  '2': 'Emerald Bay Meeting Rooms',
-  '3': 'Gallery Lounge',
-  '4': 'Crystal Cove Lounge',
-  '5': 'Crystal Cove Auditorium',
-  '6': 'Empty Room',
-  '7': 'Crescent Bay Rooms',
-  '8': 'Computer Lab',
-  '9': 'CSL Patio',
-  'c': 'Courtyard Study Lounge',
-  ' ': 'Hallway',
-  'd': 'UCI Bookstore',
-  'e': 'West Courtyard',
-  'f': 'Pacific Ballroom'
-};
-
 export default function MazeMinigame(props: { finishGame: (pointsWon: number) => void }) {
   const player = useRef<Player>({
-    x: 12,
-    y: 12,
+    x: 71,
+    y: 17,
     floor: 2,
-    walkingStep: 0
+    walkingStep: 0,
+    hasBackpack: false
   });
+
+  const backpackCoords = useRef({ x: 14, y: 4, floor: 1 } );
 
   // Using ref to prevent issues with useEffect
   const keysPressed = useRef<KeysPressed>({});
@@ -110,6 +42,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   const assetStudentCenterInterior = useRef<null | HTMLImageElement>(null);
   const assetPetr = useRef<null | HTMLImageElement>(null);
   const assetPetr2 = useRef<null | HTMLImageElement>(null);
+  const assetBackpack = useRef<null | HTMLImageElement>(null);
 
   const tileWidth = 36;
   const controls: Record<string, string> = {
@@ -228,6 +161,29 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         assetPetr!.current as CanvasImageSource :
         assetPetr2!.current as CanvasImageSource
     );
+    // Backpack
+    if (player.current.hasBackpack) {
+      renderAtCoord(
+        player.current.x + 0.2, 
+        player.current.y + 0.2, 
+        ctx, 
+        1.1, 
+        1.1, 
+        assetBackpack!.current as CanvasImageSource
+      );
+    } else if (
+      backpackCoords.current.floor == player.current.floor
+      && playerRoom == floorPlan[backpackCoords.current.y][backpackCoords.current.x]
+    ) {
+      renderAtCoord(
+        backpackCoords.current.x - 0.2, 
+        backpackCoords.current.y - 0.2, 
+        ctx, 
+        1.4, 
+        1.4, 
+        assetBackpack!.current as CanvasImageSource
+      );
+    }
     // UI
     if (timer) {
       ctx.fillStyle = "red";
@@ -236,8 +192,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
       const minLeft = Math.floor(secLeftTotal / 60);
       const secLeft = secLeftTotal % 60;
       const formatTime = minLeft + ":" + (secLeft < 10 ? '0' : '') + secLeft;
-      ctx.font="24px Arial";
-      ctx.fillText(formatTime, width - 180, 40);
+      ctx.font="28px Arial";
+      ctx.fillText(formatTime, width - 120, 44);
     }
     const playerRoomName = player.current.floor == 2 ? ROOMS_2[playerRoom] : ROOMS_1[playerRoom];
     if (playerRoomName) {
@@ -291,6 +247,15 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         if (player.current.floor == 2) player.current.floor = 1;
         else player.current.floor = 2;
       }
+      const gotBackpack = (
+        player.current.x == backpackCoords.current.x
+        && player.current.y == backpackCoords.current.y
+        && player.current.floor == backpackCoords.current.floor
+        && !player.current.hasBackpack
+      );
+      if (gotBackpack) {
+        player.current.hasBackpack = true;
+      }
     }
     if (pressed) {
       cooldown.current = Date.now() + 70;
@@ -329,14 +294,14 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
   });
 
   useEffect(() => {
-    const GAME_DURATION = 60 * 1000;
-    timer.current = Date.now() + GAME_DURATION;
+    const GAME_DURATION_SECONDS = 80;
+    timer.current = Date.now() + GAME_DURATION_SECONDS * 1000;
   }, []);
 
   return (
     <div className="main-container">
       <div className="quests">
-        <span><i>Objectives:</i></span>
+        <span>You accidentally left your backpack in Emerald Bay!</span>
         <div className="quest">
           <div className="checkbox">
           </div>
@@ -345,7 +310,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <div className="quest">
           <div className="checkbox">
           </div>
-          <span>Escape the student center</span>
+          <span>Escape the student center (get to Ring Road)</span>
         </div>
       </div>
       <div ref={canvasWrapper} className="canvas-wrapper">
@@ -357,6 +322,7 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
         <img src={ImageStudentCenterInterior} ref={assetStudentCenterInterior} />
         <img src={ImagePetr} ref={assetPetr} />
         <img src={ImagePetr2} ref={assetPetr2} />
+        <img src={ImageBackpack} ref={assetBackpack} />
       </div>
     </div>
   );
