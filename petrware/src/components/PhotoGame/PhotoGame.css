@@ -1,0 +1,21 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 100px);
+  gap: 10px;
+  justify-content: center;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell img {
+  width: 80px;
+  height: 80px;
+  cursor: pointer;
+}
