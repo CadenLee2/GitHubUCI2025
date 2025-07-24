@@ -6,7 +6,7 @@ div.home {
   justify-content: center;
   gap: 0px;
   height: 100%;
-  background-image: url("../../public/UCIScene.jpg");
+  background-image: url("../../UCIScene.jpg");
   background-size: cover;
   background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: multiply;
