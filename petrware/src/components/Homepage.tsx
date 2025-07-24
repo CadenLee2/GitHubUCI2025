@@ -1,3 +1,4 @@
+import '../App.css'
 import './Home.css';
 import { useRef, useEffect } from "react";
 import PetrCharacter from "../assets/PetrCharacter.png";
@@ -28,9 +29,9 @@ export default function Homepage(props: { startGame: () => void }) {
   }, []);
 
   return (
-    <div className="home">
+    <div className="uci-bg-wrapper">
       <img className="petr-img" src={PetrCharacter} ref={petrRef} />
-      <div className="flexcol">
+      <div className="contained-info" style={{marginRight: 80}}>
         <h1>PetrWare</h1>
         <div>
           <span>Welcome!</span>
