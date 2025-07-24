@@ -19,3 +19,7 @@
   height: 80px;
   cursor: pointer;
 }
+
+.game {
+    background-image: url("petrware\src\assets\Aldrich-Park.jpg")
+}
