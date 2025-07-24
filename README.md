@@ -15,8 +15,8 @@ If you want to play the game, scroll to the bottom for instructions!
 ## Development: Running the Game
 You can run the game through GitHub Codespaces.
 1. Click on the green Code button on GitHub, then navigate to Codespaces:
-<img title="How to access the Codespace" src="screenshots/Screenshot_Codespaces.png" width="100">
 2. Launch the codespace `probable umbrella` (based on the `main` branch)
+<img title="How to access the Codespace" src="screenshots/Screenshot_Codespaces.png" width="300">
 
 Use the terminal to run the game from the `petrware` folder:
 ```sh
