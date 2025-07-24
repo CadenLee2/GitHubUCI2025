@@ -9,6 +9,7 @@ import tooSlowScreen from "../assets/TooSlow.png";
 import successScreen from "../assets/Success.png";
 
 export default function UTCMinigame(props: { finishGame: (pointsWon: number) => void }) {
+    const { finishGame } = props;
     const [animationState, setAnimationState] = useState(0);
     const [cardx, setCardX] = useState(0);
     let cardy = useRef<number>(0);
@@ -23,6 +24,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     const assetSuccessScreen = useRef<null | HTMLImageElement>(null);
 
     let timer = useRef<number>(0); 
+    let endTimer = useRef<number>(0);
     let gameOver = useRef<number>(0);
     let currScreen = useRef<CanvasImageSource>(null);
     let is_dragging = false;
@@ -115,6 +117,9 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         }
         else{
             currScreen.current = assetSuccessScreen.current;
+            endTimer.current = timer.current;
+            timer.current = 0;
+            finishGame(500);
         }
     }
 
