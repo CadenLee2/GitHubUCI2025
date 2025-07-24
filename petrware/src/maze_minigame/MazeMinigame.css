@@ -1,0 +1,79 @@
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+  height: 100%;
+}
+
+.quests {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.quests-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.quest {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox {
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 16px;
+  max-height: 16px;
+  border: solid 2px white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.checked {
+  border: solid 2px green;
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+.finished-text {
+  text-decoration-line: line-through;
+  color: gray;
+}
+
+.canvas-wrapper {
+  width: 100%;
+  height: 10px;
+  flex-grow: 1;
+}
+
+canvas.main-canvas {
+  width: 100%;
+}
+
+.assets {
+  display: none;
+}
+
+div.info-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  height: 100%;
+  padding: 100px;
+  text-align: center;
+}
