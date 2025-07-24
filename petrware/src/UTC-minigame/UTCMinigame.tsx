@@ -21,7 +21,9 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     const assetTooFastScreen = useRef<null | HTMLImageElement>(null);
     const assetTooSlowScreen = useRef<null | HTMLImageElement>(null);
     const assetSuccessScreen = useRef<null | HTMLImageElement>(null);
+
     let timer = useRef<number>(0); 
+    let gameOver = useRef<number>(0);
     let currScreen = useRef<CanvasImageSource>(null);
     let is_dragging = false;
     let startY = 0;
@@ -105,10 +107,10 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     }
 
     function check(){
-        if(time.current < 40){
+        if(time.current < 30){
             currScreen.current = assetTooFastScreen.current;
         }
-        else if(time.current > 60){
+        else if(time.current > 70){
             currScreen.current = assetTooSlowScreen.current;
         }
         else{
@@ -129,8 +131,22 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
             canvas.current!.onmouseup = mouse_up;
             canvas.current!.onmouseout = mouse_out;
             canvas.current!.onmousemove = mouse_move;
-            startTimer();
+            if(timer.current ==0){
+                startTimer();
+            }
         }
+    }
+
+    function timeUntil(timePoint: number) {
+        const timeLeft = timePoint - Date.now();
+        const secLeftTotal = Math.floor(timeLeft / 1000);
+        const minLeft = Math.floor(secLeftTotal / 60);
+        const secLeft = secLeftTotal % 60;
+        if(minLeft == 0 && secLeft==0){
+            console.log("hi");
+            gameOver.current = 1;
+        }
+        return { minLeft, secLeft };
     }
 
     function render(){
@@ -142,8 +158,9 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         ctx.fillStyle = "black";
         ctx.imageSmoothingEnabled = false;
         ctx.fillRect(0, 0, width, height);
-
-        if(animationState == 0){
+        
+        if(!gameOver.current)
+        {if(animationState == 0){
             animate();
         }
 
@@ -158,14 +175,33 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         );
         ctx.drawImage(
             currScreen!.current as CanvasImageSource, 500, 160, 356, 234
-        )
-        timer!.current += 10;
+        )}
+        if (timer.current > 0) {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.beginPath();
+            ctx.roundRect(width - 130, 20, 74, 30, 8);
+            ctx.fill();
+            ctx.fillStyle = "orange";
+            let countdown: {minLeft:number, secLeft:number};
+
+            if(!gameOver.current){
+                countdown = timeUntil(timer.current ?? 0);
+            }
+            else{
+                countdown = {minLeft:0,secLeft:0};
+            }
+
+            const formatTime = countdown.minLeft + ":" + (countdown.secLeft < 10 ? '0' : '') + countdown.secLeft;
+            ctx.font="28px Arial";
+            ctx.fillText(formatTime, width - 120, 44);
+        }
+        
     }
     
     useEffect(() => {
         currScreen = assetSwipeScreen;
         render();
-
+        
         const intervalId = window.setInterval(render, 10);
 
         return () => {
