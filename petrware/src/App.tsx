@@ -41,7 +41,7 @@ function App() {
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
             {currentPage == "home" && <Homepage startGame={() => goToPage("game1")} />}
-            {currentPage == "game1" && <MazeMinigame finishGame={finishGame} />}
+            {currentPage == "game1" && <RoadMinigame finishGame={finishGame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>

@@ -44,15 +44,15 @@ function Player({ roadWidth, roadHeight, setPlayerX, setPlayerY }: { roadWidth: 
       // Calculate movement bounds
       const maxBoundsX = (roadWidth / 2) - (playerWidth / 2);
       const maxBoundsY = (roadHeight / 2) - (playerHeight / 2);
-      const moveSpeed = 4;
+      const moveSpeed = 3;
 
       // Update X position
       setX((prevX) => {
         let newX = prevX;
-        if (keysPressed.current.has("ArrowRight")) {
+        if (keysPressed.current.has("ArrowRight") || keysPressed.current.has("d")) {
           newX += moveSpeed;
         }
-        if (keysPressed.current.has("ArrowLeft")) {
+        if (keysPressed.current.has("ArrowLeft") || keysPressed.current.has("l")) {
           newX -= moveSpeed;
         }
         // Clamp to bounds
@@ -64,11 +64,11 @@ function Player({ roadWidth, roadHeight, setPlayerX, setPlayerY }: { roadWidth: 
       // Update Y position
       setY((prevY) => {
         let newY = prevY;
-        if (keysPressed.current.has("ArrowDown")) {
-          newY += moveSpeed;
-        }
-        if (keysPressed.current.has("ArrowUp")) {
+        if (keysPressed.current.has("ArrowDown") || keysPressed.current.has("s")) {
           newY -= moveSpeed;
+        }
+        if (keysPressed.current.has("ArrowUp") || keysPressed.current.has("w")) {
+          newY += moveSpeed;
         }
         // Clamp to bounds
         const finalY = Math.max(-maxBoundsY, Math.min(newY, maxBoundsY));
@@ -90,11 +90,14 @@ function Player({ roadWidth, roadHeight, setPlayerX, setPlayerY }: { roadWidth: 
 
 
   // Render player as a blue circle
+  // transform: `translate(${x}px, ${y}px)`,
   return (
     <div
       style={{
         borderRadius: '50%',
-        transform: `translate(${x}px, ${y}px)`,
+        position: 'absolute',
+        left: `calc(50% + ${x}px)`,
+        top: `calc(50% + ${-y}px)`,
         width: playerWidth,
         height: playerHeight,
         background: 'skyblue',
@@ -120,12 +123,16 @@ function Wall({ x, width }: { x: number, width: number }) {
 
 // Obstacle component: Renders a moving obstacle (bike/scooter)
 function Obstacle({ x, y, width, height, direction, image }: { x: number, y: number, width: number, height: number, direction: "up" | "down", image: string }) {
+  
+  // left: `calc(50% + ${x - width / 2}px)`,
+  // top: `calc(50% + ${-y - height / 2}px)`,
+
   return (
     <div
       style={{
         position: 'absolute',
-        left: `calc(50% + ${x - width / 2}px)`,
-        top: `calc(50% + ${-y - height / 2}px)`,
+        left: `calc(50% + ${x}px)`,
+        top: `calc(50% + ${-y}px)`,
         width,
         height,
         border: '2px solid #333',
@@ -154,7 +161,7 @@ function Obstacle({ x, y, width, height, direction, image }: { x: number, y: num
 
 
 // Main game component: Handles game state, obstacle spawning, win/loss logic
-function RoadMinigame() {
+function RoadMinigame(props: { finishGame: (points: number) => void }) {
   // Road dimensions
   const [roadWidth, setRoadWidth] = useState(0);
   const [roadHeight, setRoadHeight] = useState(0);
@@ -229,9 +236,24 @@ function RoadMinigame() {
           )
       );
 
+      // Collision detection for obstacles
+      const OBSTACLE_WIDTH = 70;
+      const OBSTACLE_HEIGHT = 150;
+      for (const ob of obstacles) {
+        if (
+          playerX >= ob.x && playerX < ob.x + OBSTACLE_WIDTH
+          && playerY >= ob.y && playerY < ob.y + OBSTACLE_HEIGHT
+        ) {
+          // Dead
+          //setGameResult('lose');
+          console.log("Game over. Ob, player: " + ob.x + ',' + ob.y + '; ' + playerX + ',' + playerY);
+        }
+      }
+
       // Win zone detection (left side strip)
       const winZoneWidth = 40; // px, same as wall width for visual alignment
       if (playerX - playerWidth / 2 <= -roadWidth / 2 + winZoneWidth) {
+        // Win the game
         setGameResult('win');
         return;
       }
@@ -331,8 +353,19 @@ function RoadMinigame() {
       {!showText && (
         gameResult === 'win' ? (
           // Win screen
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#063', color: 'white', fontSize: '2rem' }}>
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#063', color: 'white', fontSize: '2rem', gap: 20 }}>
             <h1>You crossed Ring Road</h1>
+            <span>+5000 points!</span>
+            <br />
+            <button onClick={() => props.finishGame(5000)}>Continue</button>
+          </div>
+        ) : gameResult === 'lose' ? (
+          // Lose screen
+          <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#890c14', color: 'white', fontSize: '2rem', gap: 20 }}>
+            <h1>You did not cross Ring Road!</h1>
+            <span>+0 points!</span>
+            <br />
+            <button onClick={() => props.finishGame(0)}>Continue</button>
           </div>
         ) : (
           <>
