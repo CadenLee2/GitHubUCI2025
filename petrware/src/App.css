@@ -91,3 +91,7 @@ div.uci-bg-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
   background-blend-mode: multiply;
 }
+
+img.map-img {
+  height: 400px;
+}

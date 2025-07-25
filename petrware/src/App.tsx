@@ -27,6 +27,11 @@ const PAGES_PROGRESSION = [
   "end"
 ];
 
+const MAP_DESCRIPTIONS: Record<string, string> = {
+  "map1": "You line up at the starting line, but realize you've lost something...",
+  "map2": "You're done!"
+}
+
 /** The main display of the app */
 function App() {
   /** The game state */
@@ -42,7 +47,7 @@ function App() {
     setCurrentPage(PAGES_PROGRESSION[nextPageIndex]);
   }
 
-  function finishGame(pointsWon: number) {
+  function finishMinigame(pointsWon: number) {
     setTotalScore(totalScore + pointsWon);
     goToNextPage();
   }
@@ -53,18 +58,13 @@ function App() {
         <div className="main-box">
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
+            {currentPage.startsWith("map") && <MapScreen
+              currentPage={currentPage}
+              proceed={goToNextPage}
+              description={MAP_DESCRIPTIONS[currentPage]}
+            />}
             {currentPage == "home" && <Homepage startGame={goToNextPage} />}
-            {currentPage == "map1" && <MapScreen
-              currentPage={currentPage}
-              proceed={goToNextPage}
-              description="Ready to start?"
-            />}
-            {currentPage == "game1" && <MazeMinigame finishGame={finishGame} />}
-            {currentPage == "map2" && <MapScreen
-              currentPage={currentPage}
-              proceed={goToNextPage}
-              description="You're done!"
-            />}
+            {currentPage == "game1" && <MazeMinigame finishGame={finishMinigame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>
