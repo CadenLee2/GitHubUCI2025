@@ -437,7 +437,8 @@ export default function MazeMinigame(props: { finishGame: (pointsWon: number) =>
 
   function win(minLeftNum: number, secLeftNum: number) {
     setScreen("win");
-    setPointsWon(minLeftNum * 60 + secLeftNum);
+    const secsLeftTotal = minLeftNum * 60 + secLeftNum;
+    setPointsWon(secsLeftTotal * 100);
     setMinLeft(minLeftNum);
     setSecLeft(secLeftNum);
   }
