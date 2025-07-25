@@ -15,13 +15,16 @@ const goodImgSrc = squirrel;
 const badImgSrc = crow;
 const TARGET_SIZE = 80;
 
-const PhotoGame: React.FC = () => {
+
+
+const PhotoGame = (props: { finishGame: (pointsWon:number) => void}) => {
   const [score, setScore] = useState(0);
   const [targets, setTargets] = useState<Target[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const [gameStart, setGameStart] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const {finishGame} = props
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -68,7 +71,14 @@ const PhotoGame: React.FC = () => {
   }, []);
 
   const handleClick = (target: Target) => {
-    setScore(score + (target.isGood ? 1 : -1));
+    if(target.isGood){
+      setScore(score + 1);
+    }
+    else {
+      if(score > 0){
+        setScore(score - 1)
+      }
+    }
     setTargets((prev) => prev.filter((t) => t.id !== target.id));
   };
 
@@ -94,7 +104,7 @@ const PhotoGame: React.FC = () => {
               <br />
               You have 30 seconds. Good luck!
             </p>
-            <button className="start-button" onClick={() => setGameStart(true)}>
+            <button className="start-end-button" onClick={() => setGameStart(true)}>
               Start Game
             </button>
           </div>
@@ -122,15 +132,26 @@ const PhotoGame: React.FC = () => {
       {gameOver && (
         <div className="overlay">
           <div className="overlay-content">
-            <h2 style={{ marginBottom: 20 }}>!! TIME IS UP !!</h2>
+            {score > 1 && <div>
+              <h2 style={{ marginBottom: 20 }}>!! TIME IS UP !!</h2>
             <p style={{ marginBottom: 30 }}>
               You have {score} photos to show at the petr drop!
               <br />
-              Game score: {score * 100}
+              Game score: {score * 250}
             </p>
-            <button className="start-button">
-              Next
+            <button className="start-end-button" onClick={() => finishGame(score * 250)}>
+              Next Game
             </button>
+              </div>}
+            {score == 0 && <div>
+            <h2 style={{ marginBottom: 20 }}>!! TIME IS UP !!</h2>
+            <p style={{ marginBottom: 30 }}>
+              You didn't get any photos...
+            </p>
+            <button className="start-end-button" onClick={() => {location.reload()}}>
+              Back to home
+            </button>
+              </div>}
           </div>
         </div>
       )}
