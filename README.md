@@ -63,4 +63,48 @@ To help us collaborate, make sure to:
 - Try testing your changes on the Codespace (see [Running the Game](#development-running-the-game) above)
 
 ## Playing the Game
-Coming soon!
+
+### Maze Minigame
+
+<img width="1009" height="788" alt="image" src="https://github.com/user-attachments/assets/fef6bbd5-f65e-4eae-ac3e-8beab77d44c3" />
+
+
+Controls: WASD or Arrow Keys to move around
+
+Use stairs to navigate between floors
+
+<img width="124" height="127" alt="image" src="https://github.com/user-attachments/assets/eb4deeb7-f44a-4b76-abd9-394bbdd55f6b" />
+
+<img width="120" height="149" alt="image" src="https://github.com/user-attachments/assets/fa0d4ebe-204f-4bf2-af74-cf8176b7348c" />
+
+Explore the map to find all your belongings!
+
+Water Bottle
+<img width="67" height="81" alt="image" src="https://github.com/user-attachments/assets/9f78828d-1966-42e9-ab37-4ed756d960f7" />
+
+Backpack
+<img width="80" height="81" alt="image" src="https://github.com/user-attachments/assets/4d6f0fb5-0b0d-4e98-8fb1-f17a57b855bf" />
+
+Now escape to Ring Road!
+
+### UTC Game
+
+<img width="1026" height="809" alt="image" src="https://github.com/user-attachments/assets/17454dfb-14fb-451c-a331-9db8f2ff46ac" />
+
+
+Controls: Click to hold the card and drag to swipe the card. Do it at the right speed to make sure the card reads correctly!
+
+<img width="497" height="405" alt="image" src="https://github.com/user-attachments/assets/4ce1c003-f838-4f76-80f9-31a0517569af" />
+
+<img width="486" height="431" alt="image" src="https://github.com/user-attachments/assets/536f101f-25b5-4eaa-88e1-2cdab50e831a" />
+
+<img width="525" height="383" alt="image" src="https://github.com/user-attachments/assets/66cf6094-bc77-4fe6-b25d-79db98dc3719" />
+
+
+### Photo-taking Game
+
+Controls: Click the animals to take pictures of them
+
+Taking photos of squirrels will give you a point, but taking a photo of a crow will cause you to lose points! Take as many photos of squirrels as you can in 30 seconds!
+
+<img width="1004" height="788" alt="image" src="https://github.com/user-attachments/assets/ebbd279f-0622-4ca9-bcbe-fea4b99df516" />

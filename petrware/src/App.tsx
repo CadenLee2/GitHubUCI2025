@@ -4,6 +4,7 @@ import Homepage from './components/Homepage';
 import MapScreen from './components/MapScreen';
 import EndScreen from './components/EndScreen';
 import MazeMinigame from './maze_minigame/MazeMinigame';
+import RoadMinigame from './road_minigame/RoadMinigame';
 import PhotoGame from './components/PhotoGame/PhotoGame';
 import UTCMinigame from './UTC-minigame/UTCMinigame';
 
@@ -28,6 +29,7 @@ const PAGES_PROGRESSION = [
   "map3",
   "utc",
   "map4",
+  "road",
   "map5",
   "photo",
   "map6",
@@ -39,7 +41,7 @@ const MAP_DESCRIPTIONS: Record<string, string> = {
     "It's time for UCI's famous sticker run.\n"
     + "You line up at the starting line, but realize you've lost something...",
   "map3": "You're feeling a bit thirsty, so it's probably time to make a boba stop at UTC!",
-  "map4": "Now it's time to head to your destination along Ring Road.",
+  "map4": "Now it's time to head to your destination along Ring Road, but watch out for bikes!.",
   "map5": "You suddenly get a notification on your phone.",
   "map6": "You've reached the finish line!"
 }
@@ -78,6 +80,7 @@ function App() {
             {currentPage == "home" && <Homepage startGame={goToNextPage} />}
             {currentPage == "maze" && <MazeMinigame finishGame={finishMinigame} />}
             {currentPage == "utc" && <UTCMinigame finishGame={finishMinigame} />}
+            {currentPage == "road" && <RoadMinigame finishGame={finishMinigame} />}
             {currentPage == "photo" && <PhotoGame finishGame={finishMinigame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
