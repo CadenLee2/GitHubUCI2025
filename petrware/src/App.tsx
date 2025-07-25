@@ -3,6 +3,7 @@ import './App.css'
 import Homepage from './components/Homepage';
 import MazeMinigame from './maze_minigame/MazeMinigame';
 import EndScreen from './components/EndScreen';
+import PhotoGame from './components/PhotoGame/PhotoGame';
 
 /** The bar at the top that shows the score */
 function ScoreBar(props: {totalScore: number}) {
