@@ -1,5 +1,5 @@
 import './UTCMinigame.css'
-import {useRef, useEffect, useState} from "react";
+import {useRef, useEffect} from "react";
 import bottomWallet from "../assets/bottomWallet.png";
 import topWallet from "../assets/topWallet.png";
 import card from "../assets/card.png";
@@ -10,9 +10,16 @@ import successScreen from "../assets/Success.png";
 
 export default function UTCMinigame(props: { finishGame: (pointsWon: number) => void }) {
     const { finishGame } = props;
-    const [animationState, setAnimationState] = useState(0);
-    const [cardx, setCardX] = useState(0);
-    let cardy = useRef<number>(0);
+    const animationState = useRef(0);
+    const cardx = useRef(0);
+    const cardy = useRef<number>(0);
+
+    /**
+        Kinda painful on small screen since it doesn't resize,
+        but a constant width makes it way easier to deal with calculations
+    */
+    const CANVAS_WIDTH = 996;
+    const CANVAS_HEIGHT = 756;
 
     const canvas = useRef<null | HTMLCanvasElement>(null);
     const assetCard = useRef<HTMLImageElement>(null);
@@ -23,24 +30,39 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     const assetTooSlowScreen = useRef<null | HTMLImageElement>(null);
     const assetSuccessScreen = useRef<null | HTMLImageElement>(null);
 
-    let timer = useRef<number>(0); 
-    let endTimer = useRef({minLeft:0, secLeft:0});
-    let gameOver = useRef<number>(0);
-    let currScreen = useRef<CanvasImageSource>(null);
-    let is_dragging = false;
-    let startY = 0;
-    let startX = 0;
-    let time = useRef<number>(0);
-    let timeEnd = useRef<number>(0);
-    let successCountdown = useRef<number>(0);
+    const timer = useRef<number>(0);
+    const endTimer = useRef({minLeft:0, secLeft:0});
+    const gameOver = useRef<number>(0);
+    const currScreen = useRef<CanvasImageSource>(null);
+    const is_dragging = useRef(false);
+    const startY = useRef(0);
+    const startX = useRef(0);
+    const time = useRef<number>(0);
+    const timeEnd = useRef<number>(0);
+    const successCountdown = useRef<number>(0);
+
+    function mousePosRelativeToCanvas(mouseX: number, mouseY: number) {
+        const rect = canvas.current!.getBoundingClientRect();
+        const scaleX = canvas.current!.width / rect.width;
+        const scaleY = canvas.current!.height / rect.height;
+
+        return {
+            x: (mouseX - rect.left) * scaleX,
+            y: (mouseY - rect.top) * scaleY
+        }
+    }
 
     function mouseOnCard(x:number, y:number){
-        const leftBuffer = (window.innerWidth - 936)/2;
-        const topBuffer = 42;
-        if(x - leftBuffer < 730  || x-leftBuffer > 770 + 135){
+        // Get relative to canvas to work on all screen sizes
+        const relPos = mousePosRelativeToCanvas(x, y);
+        const leftBuffer = 750;
+        const leftBufferWidth = 135;
+        const topBuffer = 0;
+        const topBufferHeight = 220;
+        if (relPos.x < leftBuffer || relPos.x >= leftBuffer + leftBufferWidth) {
             return false;
         }
-        if(y - topBuffer < -10 || y - topBuffer > 230){
+        if (relPos.y < topBuffer || relPos.y >= topBuffer + topBufferHeight) {
             return false;
         }
         return true;
@@ -49,11 +71,11 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     function mouse_down(event: MouseEvent){
         event.preventDefault();
         
-        startY = event.clientY;
-        startX = event.clientX;
+        startY.current = event.clientY;
+        startX.current = event.clientX;
 
-        if(mouseOnCard(startX, startY)){
-            is_dragging = true;
+        if(mouseOnCard(startX.current, startY.current)){
+            is_dragging.current = true;
             return;
         }
     }
@@ -61,10 +83,10 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     function mouse_up(event:MouseEvent){
         event.preventDefault();
 
-        if(!is_dragging){
+        if(!is_dragging.current){
             return;
         }
-        is_dragging = false;
+        is_dragging.current = false;
         cardy.current = 0;
         time.current = 0;
         timeEnd.current = 0;
@@ -74,23 +96,23 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     function mouse_out(event:MouseEvent){
         event.preventDefault();
 
-        if(!is_dragging){
+        if(!is_dragging.current){
             return;
         }
-        is_dragging = false;
+        is_dragging.current = false;
         cardy.current = 0;
         render();
     }
 
     function mouse_move(event:MouseEvent){
-        if(!is_dragging){
+        if(!is_dragging.current){
             return;
         }
         else{
             event.preventDefault();
-            let mouseY = event.clientY;
+            const mouseY = event.clientY;
             
-            let dy = mouseY - startY;
+            const dy = mouseY - startY.current;
             if(dy > 0){
                 cardy.current=dy;
             }
@@ -98,7 +120,6 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
                 if(!timeEnd.current){
                     time.current += 1;
                 }
-                //40
             }
             if(dy > 384){
                 timeEnd.current = 1;
@@ -133,9 +154,11 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     }
 
     function animate(){
-        setCardX(cardx + 2);
-        if(cardx == 750){
-            setAnimationState(1);
+        // The useState rerenders made this move faster, so increased the speed
+        // to make up for it
+        cardx.current += 8;
+        if(cardx.current >= 750){
+            animationState.current = 1;
             canvas.current!.onmousedown = mouse_down;
             canvas.current!.onmouseup = mouse_up;
             canvas.current!.onmouseout = mouse_out;
@@ -160,8 +183,9 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
 
     function render(){
         const ctx = canvas.current!.getContext("2d")!;
-        const width = canvas.current!.offsetWidth;
-        const height = canvas.current!.offsetHeight;
+        // This gets the actual dimensions in terms of rendering
+        const width = canvas.current!.width;
+        const height = canvas.current!.height;
         ctx.imageSmoothingEnabled = false;
 
         ctx.fillStyle = "black";
@@ -169,7 +193,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         ctx.fillRect(0, 0, width, height);
         
         if(!gameOver.current)
-        {if(animationState == 0){
+        {if(animationState.current == 0){
             animate();
         }
 
@@ -177,7 +201,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
             assetTopWallet!.current as CanvasImageSource, 123, 0, 86, 574
         )
         ctx.drawImage(
-            assetCard!.current as CanvasImageSource, cardx, cardy.current, 135, 220
+            assetCard!.current as CanvasImageSource, cardx.current, cardy.current, 135, 220
         );
         ctx.drawImage(
             assetBotWallet!.current as CanvasImageSource,0,0,123,572
@@ -213,7 +237,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     }
     
     useEffect(() => {
-        currScreen = assetSwipeScreen;
+        currScreen.current = assetSwipeScreen.current as CanvasImageSource;
         render();
         
         const intervalId = window.setInterval(render, 10);
@@ -226,7 +250,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     return(
     <>
         <div id="canvasWrapper">
-        <canvas id="canvas" ref={canvas} width={936} height={655}></canvas>
+        <canvas id="canvas" ref={canvas} width={CANVAS_WIDTH} height={CANVAS_HEIGHT}></canvas>
         </div>
         <div id="assets">
             <img src={card} ref={assetCard}/>
