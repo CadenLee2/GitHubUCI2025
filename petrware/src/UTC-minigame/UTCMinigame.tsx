@@ -24,7 +24,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     const assetSuccessScreen = useRef<null | HTMLImageElement>(null);
 
     let timer = useRef<number>(0); 
-    let endTimer = useRef<number>(0);
+    let endTimer = useRef({minLeft:0, secLeft:0});
     let gameOver = useRef<number>(0);
     let currScreen = useRef<CanvasImageSource>(null);
     let is_dragging = false;
@@ -32,6 +32,7 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
     let startX = 0;
     let time = useRef<number>(0);
     let timeEnd = useRef<number>(0);
+    let successCountdown = useRef<number>(0);
 
     function mouseOnCard(x:number, y:number){
         const leftBuffer = (window.innerWidth - 936)/2;
@@ -117,10 +118,13 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
         }
         else{
             currScreen.current = assetSuccessScreen.current;
-            endTimer.current = timer.current;
-            timer.current = 0;
-            finishGame(500);
+            endTimer.current = timeUntil(timer.current ?? 0);
         }
+    }
+
+    function endGame(){
+        console.log(endTimer.current.secLeft);
+        finishGame((endTimer.current.secLeft + 1) * 100);
     }
 
     function startTimer(){
@@ -200,7 +204,12 @@ export default function UTCMinigame(props: { finishGame: (pointsWon: number) => 
             ctx.font="28px Arial";
             ctx.fillText(formatTime, width - 120, 44);
         }
-        
+        if(endTimer.current.secLeft){
+            successCountdown.current += 1;
+        }
+        if(successCountdown.current == 70){
+            endGame();
+        }
     }
     
     useEffect(() => {
