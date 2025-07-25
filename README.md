@@ -108,11 +108,3 @@ Controls: Click the animals to take pictures of them
 Taking photos of squirrels will give you a point, but taking a photo of a crow will cause you to lose points! Take as many photos of squirrels as you can in 30 seconds!
 
 <img width="1004" height="788" alt="image" src="https://github.com/user-attachments/assets/ebbd279f-0622-4ca9-bcbe-fea4b99df516" />
-
-
-
-
-
-
-
-

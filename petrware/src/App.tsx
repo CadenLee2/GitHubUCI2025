@@ -3,6 +3,7 @@ import './App.css'
 import Homepage from './components/Homepage';
 import MazeMinigame from './maze_minigame/MazeMinigame';
 import EndScreen from './components/EndScreen';
+import RoadMinigame from './road_minigame/RoadMinigame';
 import PhotoGame from './components/PhotoGame/PhotoGame';
 
 /** The bar at the top that shows the score */
@@ -40,7 +41,7 @@ function App() {
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
             {currentPage == "home" && <Homepage startGame={() => goToPage("game1")} />}
-            {currentPage == "game1" && <MazeMinigame finishGame={finishGame} />}
+            {currentPage == "game1" && <RoadMinigame finishGame={finishGame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>
