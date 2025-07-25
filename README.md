@@ -21,6 +21,7 @@ You can run the game through GitHub Codespaces.
 Use the terminal to run the game from the `petrware` folder:
 ```sh
 cd petrware
+npm i
 npm run dev
 ```
 
