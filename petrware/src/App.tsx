@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import './App.css'
 import Homepage from './components/Homepage';
-import MazeMinigame from './maze_minigame/MazeMinigame';
 import MapScreen from './components/MapScreen';
 import EndScreen from './components/EndScreen';
+import MazeMinigame from './maze_minigame/MazeMinigame';
 import PhotoGame from './components/PhotoGame/PhotoGame';
+import UTCMinigame from './UTC-minigame/UTCMinigame';
 
 /** The bar at the top that shows the score */
 function ScoreBar(props: {totalScore: number}) {
@@ -23,14 +24,21 @@ function ScoreBar(props: {totalScore: number}) {
 const PAGES_PROGRESSION = [
   "home",
   "map1",
-  "game1",
-  "map2",
+  "maze",
+  "map3",
+  "utc",
+  "map4",
+  "map5",
+  "photo",
+  "map6",
   "end"
 ];
 
 const MAP_DESCRIPTIONS: Record<string, string> = {
   "map1": "You line up at the starting line, but realize you've lost something...",
-  "map2": "You're done!"
+  "map3": "You're feeling a bit thirsty, so it's probably time to make a boba stop at UTC!",
+  "map4": "Now it's time to head to your destination along Ring Road.",
+  "map6": "You suddenly get a notification on your phone."
 }
 
 /** The main display of the app */
@@ -65,7 +73,9 @@ function App() {
               description={MAP_DESCRIPTIONS[currentPage]}
             />}
             {currentPage == "home" && <Homepage startGame={goToNextPage} />}
-            {currentPage == "game1" && <MazeMinigame finishGame={finishMinigame} />}
+            {currentPage == "maze" && <MazeMinigame finishGame={finishMinigame} />}
+            {currentPage == "utc" && <UTCMinigame finishGame={finishMinigame} />}
+            {currentPage == "photo" && <PhotoGame finishGame={finishMinigame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>
