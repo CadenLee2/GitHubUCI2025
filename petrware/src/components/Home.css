@@ -1,8 +1,10 @@
-div.home {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  height: 100%;
+.petr-img {
+  height: 300px;
+}
+
+.credits {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  font-size: 14px;
 }

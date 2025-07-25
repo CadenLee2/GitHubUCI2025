@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import Homepage from './components/Homepage';
+import MazeMinigame from './maze_minigame/MazeMinigame';
 import EndScreen from './components/EndScreen';
 import PhotoGame from './components/PhotoGame/PhotoGame';
 
@@ -27,15 +28,19 @@ function App() {
     setCurrentPage(newPage);
   }
 
+  function finishGame(pointsWon: number) {
+    setTotalScore(totalScore + pointsWon);
+    setCurrentPage("end");
+  }
+
   return (
     <>
       <div className="outer-container">
         <div className="main-box">
           <ScoreBar totalScore={totalScore} />
           <div className="inner-content">
-            {currentPage == "home" && <Homepage startGame={() => goToPage("photo-game")} />}
-            {currentPage == "game1" && <span>Put game pages here</span>}
-            {currentPage == "photo-game" && <PhotoGame/>}
+            {currentPage == "home" && <Homepage startGame={() => goToPage("game1")} />}
+            {currentPage == "game1" && <MazeMinigame finishGame={finishGame} />}
             {currentPage == "end" && <EndScreen score={totalScore} />}
           </div>
         </div>

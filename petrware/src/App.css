@@ -8,6 +8,7 @@ div.outer-container {
   align-items: center;
   justify-content: center;
   height: 100%;
+  padding: 10px;
 }
 
 div.main-box {
@@ -35,6 +36,8 @@ div.inner-content {
   height: 40px;
   background-color: var(--bg2);
   padding: 10px;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
 }
 
 button {
@@ -63,4 +66,28 @@ div.home {
   justify-content: center;
   gap: 10px;
   height: 100%;
+}
+
+div.contained-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 30px 26px;
+}
+
+div.uci-bg-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+  background-image: url("../../UCIScene.jpg");
+  background-size: cover;
+  background-color: rgba(0, 0, 0, 0.5);
+  background-blend-mode: multiply;
 }
