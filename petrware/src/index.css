@@ -24,3 +24,7 @@ body {
 h1 {
   margin: 0px;
 }
+
+a, a:visited {
+  color: var(--text);
+}
