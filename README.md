@@ -100,6 +100,14 @@ Controls: Click to hold the card and drag to swipe the card. Do it at the right 
 
 <img width="525" height="383" alt="image" src="https://github.com/user-attachments/assets/66cf6094-bc77-4fe6-b25d-79db98dc3719" />
 
+### Ring Road Game
+
+Controls: Use arrow keys to move around
+
+Get to the other side of Ring Road and avoid all the bikes on the path!!
+
+<img width="1004" height="803" alt="image" src="https://github.com/user-attachments/assets/185c7936-f23d-40a4-8079-88fa94776db2" />
+
 
 ### Photo-taking Game
 
