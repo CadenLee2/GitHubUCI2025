@@ -59,15 +59,6 @@ button:click {
   cursor: pointer;
 }
 
-div.home {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  height: 100%;
-}
-
 div.contained-info {
   display: flex;
   flex-direction: column;
@@ -80,6 +71,7 @@ div.contained-info {
 }
 
 div.uci-bg-wrapper {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
